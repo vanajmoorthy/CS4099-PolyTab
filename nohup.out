@@ -1,0 +1,76 @@
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/data/TabDataReprGen.py:107: FutureWarning: Pass orig_sr=44100, target_sr=22050 as keyword args. From version 0.10 passing these as positional arguments will result in an error
+  data = librosa.resample(data, self.sr_original, self.sr_downs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
+/Users/vanajmoorthy/Desktop/github/tab-cnn/env/lib/python3.9/site-packages/librosa/util/decorators.py:88: UserWarning: n_fft=256 is too small for input signal of length=3
+  return f(*args, **kwargs)
