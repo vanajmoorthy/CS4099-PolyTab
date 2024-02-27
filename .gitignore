@@ -1,6 +1,9 @@
 /env
 /data/GuitarSet
 /demos
-/data/spec_repr
-/spec_repr
+/data/spec_repr/c
+/data/spec_repr/m
+/data/spec_repr/cm
+/data/spec_repr/s
+/spec_repr/
 nohup.out
