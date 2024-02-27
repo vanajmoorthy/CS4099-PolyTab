@@ -156,7 +156,7 @@ class TabCNN:
         self.model = model
 
     def train(self):
-        self.model.fit(generator=self.training_generator,
+        self.model.fit(self.training_generator,
                        validation_data=None,
                        epochs=self.epochs,
                        verbose=1,
