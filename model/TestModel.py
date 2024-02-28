@@ -78,17 +78,13 @@ class TestModel:
         return model
 
 
-def preprocess_audio(data):
+def preprocess_audio(audio_file_path, sr_down=SR_DOWN):
+    sr, data = wavfile.read(audio_file_path)
     data = data.astype(float)
     data = librosa.util.normalize(data)
-    data = librosa.resample(
-        data, orig_sr=SR_ORIGINAL, target_sr=SR_DOWN)
-    data = np.abs(librosa.cqt(data,
-                              hop_length=HOP_LENGTH,
-                              sr=SR_ORIGINAL,
-                              n_bins=CQT_N_BINS,
-                              bins_per_octave=CQT_BINS_PER_OCTAVE))
-
+    data = librosa.resample(data, orig_sr=sr, target_sr=sr_down)
+    data = np.abs(librosa.cqt(data, hop_length=HOP_LENGTH, sr=sr_down,
+                  n_bins=CQT_N_BINS, bins_per_octave=CQT_BINS_PER_OCTAVE))
     return data
 
 
