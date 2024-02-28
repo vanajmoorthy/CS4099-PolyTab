@@ -1,14 +1,14 @@
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten, Reshape, Activation
 import numpy as np
 import librosa
-from keras.models import load_model
 from scipy.io import wavfile
+import os
 
+# Define paths
+MODEL_WEIGHTS_PATH = 'model/saved/c 2024-02-27 151223/0/weights.h5'
+AUDIO_FILE_PATH = 'model/00_BN1-147-Gb_solo_mic.wav'
 
-# Define the preprocess_audio function (from TabDataReprGen.py)
-
-# Replace with the path to your saved model
-MODEL_PATH = 'saved/c 2024-02-27 151223/0/weights.h5'
-AUDIO_FILE_PATH = '00_BN1-147-Gb_solo_mic.wav'
 SR_DOWN = 22050  # Sample rate to use
 N_FFT = 2048  # FFT window size
 HOP_LENGTH = 512  # Number of samples between successive frames
@@ -17,6 +17,28 @@ CQT_N_BINS = 192
 CQT_BINS_PER_OCTAVE = 24
 
 SR_ORIGINAL, data = wavfile.read(AUDIO_FILE_PATH)
+
+# Define your model architecture here
+
+
+def build_model(input_shape, num_strings, num_classes):
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=(3, 3),
+              activation='relu', input_shape=input_shape))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(num_classes * num_strings))  # no activation
+    model.add(Reshape((num_strings, num_classes)))
+    model.add(Activation('softmax'))
+
+    # model.compile(...)
+
+    return model
 
 
 def preprocess_audio(data):
@@ -33,17 +55,23 @@ def preprocess_audio(data):
     return data
 
 
-# Load your saved model
-model = load_model(MODEL_PATH)
+# Rebuild the model architecture
+# None represents variable length in the middle dimension
 
+input_shape = (192, None, 1)
+num_strings = 6
+num_classes = 21
+model = build_model(input_shape, num_strings, num_classes)
 
+# Load the weights
+model.load_weights(MODEL_WEIGHTS_PATH)
+
+# Preprocess the audio file
 preprocessed_audio = preprocess_audio(AUDIO_FILE_PATH)
 
-# Run the model
-predictions = model.predict(preprocessed_audio)
+# Predict using the preprocessed audio
+predictions = model.predict(
+    np.array([preprocessed_audio]))  # Add batch dimension
 
-# TODO: Post-process the predictions as needed
-# This could involve converting the output tensor to a readable format,
-# mapping class indices back to labels, etc.
 
 print(predictions)
