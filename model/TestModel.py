@@ -77,22 +77,21 @@ class TestModel:
 
         return model
 
-    def preprocess_audio(self, data):
-        data = data.astype(float)
-        data = librosa.util.normalize(data)
-        data = librosa.resample(
-            data, orig_sr=SR_ORIGINAL, target_sr=SR_DOWN)
-        data = np.abs(librosa.cqt(data,
-                                  hop_length=HOP_LENGTH,
-                                  sr=SR_ORIGINAL,
-                                  n_bins=CQT_N_BINS,
-                                  bins_per_octave=CQT_BINS_PER_OCTAVE))
 
-        return data
+def preprocess_audio(data):
+    data = data.astype(float)
+    data = librosa.util.normalize(data)
+    data = librosa.resample(
+        data, orig_sr=SR_ORIGINAL, target_sr=SR_DOWN)
+    data = np.abs(librosa.cqt(data,
+                              hop_length=HOP_LENGTH,
+                              sr=SR_ORIGINAL,
+                              n_bins=CQT_N_BINS,
+                              bins_per_octave=CQT_BINS_PER_OCTAVE))
+
+    return data
 
 
-    # Rebuild the model architecture
-    # None represents variable length in the middle dimension
 if __name__ == '__main__':
     model = TestModel()
     model = model.build_model()
@@ -101,7 +100,7 @@ if __name__ == '__main__':
     model.load_weights(MODEL_WEIGHTS_PATH)
 
     # Preprocess the audio file
-    preprocessed_audio = model.preprocess_audio(AUDIO_FILE_PATH)
+    preprocessed_audio = preprocess_audio(AUDIO_FILE_PATH)
 
     # Predict using the preprocessed audio
     predictions = model.predict(
