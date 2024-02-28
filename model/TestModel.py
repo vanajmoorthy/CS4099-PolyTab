@@ -3,11 +3,6 @@ from keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, Flatten, Reshape,
 import numpy as np
 import librosa
 from scipy.io import wavfile
-import os
-
-from __future__ import print_function
-import keras
-import os
 from keras import backend as K
 from Metrics import *
 import tensorflow as tf
