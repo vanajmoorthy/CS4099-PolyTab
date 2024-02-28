@@ -83,7 +83,7 @@ def preprocess_audio(data):
 # Rebuild the model architecture
 # None represents variable length in the middle dimension
 
-input_shape = (192, None, 1)
+input_shape = (192, 9, 1)
 num_strings = 6
 num_classes = 21
 model = build_model(input_shape, num_strings, num_classes)
