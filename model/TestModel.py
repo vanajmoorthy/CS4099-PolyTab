@@ -77,7 +77,7 @@ class TestModel:
 
         return model
 
-    def preprocess_audio(data):
+    def preprocess_audio(self, data):
         data = data.astype(float)
         data = librosa.util.normalize(data)
         data = librosa.resample(
