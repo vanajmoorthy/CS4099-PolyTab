@@ -20,6 +20,15 @@ print("Num GPUs Available: ", len(
     tf.config.experimental.list_physical_devices('GPU')))
 
 
+def weighted_categorical_crossentropy(y_true, y_pred):
+    label_diff = K.abs(K.argmax(y_true, axis=-1) - K.argmax(y_pred, axis=-1))
+    weights = K.cast(K.less_equal(label_diff, 1), 'float32') * 0.5 + \
+        K.cast(K.greater(label_diff, 1), 'float32') * 2.0
+    cce = K.categorical_crossentropy(y_true, y_pred)
+    weighted_cce = cce * weights
+    return K.mean(weighted_cce)
+
+
 class TabCNN:
 
     def __init__(self,
@@ -58,14 +67,7 @@ class TabCNN:
         self.metrics["data"] = ["g0", "g1", "g2",
                                 "g3", "g4", "g5", "mean", "std dev"]
 
-        if self.spec_repr == "c":
-            self.input_shape = (192, self.con_win_size, 1)
-        elif self.spec_repr == "m":
-            self.input_shape = (128, self.con_win_size, 1)
-        elif self.spec_repr == "cm":
-            self.input_shape = (320, self.con_win_size, 1)
-        elif self.spec_repr == "s":
-            self.input_shape = (1025, self.con_win_size, 1)
+        self.input_shape = (192, self.con_win_size, 1)
 
         # these probably won't ever change
         self.num_classes = 21
@@ -149,7 +151,7 @@ class TabCNN:
         model.add(Reshape((self.num_strings, self.num_classes)))
         model.add(Activation(self.softmax_by_string))
 
-        model.compile(loss=self.catcross_by_string,
+        model.compile(loss=weighted_categorical_crossentropy,
                       optimizer=tf.keras.optimizers.Adadelta(),
                       metrics=[self.avg_acc])
 
