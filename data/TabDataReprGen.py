@@ -30,7 +30,6 @@ class TabDataReprGen:
         # cm = cqt + melspec
         # s = stft
         #
-        self.preproc_mode = mode
         self.downsample = True
         self.normalize = True
         self.sr_downs = 22050
@@ -44,7 +43,7 @@ class TabDataReprGen:
         self.hop_length = 512
 
         # save file path
-        self.save_path = "./data/spec_repr/" + self.preproc_mode + "/"
+        self.save_path = "./data/spec_repr/"
 
     def load_rep_and_labels_from_raw_file(self, filename):
         file_audio = self.path_audio + filename + "_mic.wav"
@@ -111,29 +110,12 @@ class TabDataReprGen:
             data = librosa.resample(
                 data, orig_sr=self.sr_original, target_sr=self.sr_downs)
             self.sr_curr = self.sr_downs
-        if self.preproc_mode == "c":
+
             data = np.abs(librosa.cqt(data,
                                       hop_length=self.hop_length,
                                       sr=self.sr_curr,
                                       n_bins=self.cqt_n_bins,
                                       bins_per_octave=self.cqt_bins_per_octave))
-        elif self.preproc_mode == "m":
-            data = librosa.feature.melspectrogram(
-                y=data, sr=self.sr_curr, n_fft=self.n_fft, hop_length=self.hop_length)
-        elif self.preproc_mode == "cm":
-            cqt = np.abs(librosa.cqt(data,
-                                     hop_length=self.hop_length,
-                                     sr=self.sr_curr,
-                                     n_bins=self.cqt_n_bins,
-                                     bins_per_octave=self.cqt_bins_per_octave))
-            mel = librosa.feature.melspectrogram(
-                y=data, sr=self.sr_curr, n_fft=self.n_fft, hop_length=self.hop_length)
-            data = np.concatenate((cqt, mel), axis=0)
-        elif self.preproc_mode == "s":
-            data = np.abs(librosa.stft(data, n_fft=self.n_fft,
-                          hop_length=self.hop_length))
-        else:
-            print("invalid representation mode.")
 
         return data
 

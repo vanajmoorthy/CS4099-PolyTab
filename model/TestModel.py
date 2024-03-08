@@ -8,7 +8,7 @@ from Metrics import *
 import tensorflow as tf
 
 # Define paths
-MODEL_WEIGHTS_PATH = 'model/saved/c 2024-02-27 151223/0/weights.h5'
+MODEL_WEIGHTS_PATH = 'model/saved/predictor/weights.h5'
 AUDIO_FILE_PATH = 'model/00_BN1-147-Gb_solo_mic.wav'
 
 SR_DOWN = 22050  # Sample rate to use
