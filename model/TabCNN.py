@@ -132,14 +132,13 @@ class TabCNN:
         pred_classes = K.argmax(output, axis=-1)
         class_diff = K.abs(true_classes - pred_classes)
 
-        # Apply weighting: increase weight for larger differences
+        # Ensure the operations are compatible with TensorFlow's dtype by casting to float
         weights = K.switch(K.less_equal(class_diff, 1),
-                           # Lesser penalty for errors within 1 fret
-                           K.ones_like(class_diff) * 0.5,
-                           K.ones_like(class_diff) * 2.0)   # Higher penalty for errors more than 1 fret
+                           K.cast(K.ones_like(class_diff), 'float32') * 0.5,
+                           K.cast(K.ones_like(class_diff), 'float32') * 2.0)
 
         # Apply the weights to the crossentropy loss
-        weighted_cce = cce * K.cast(weights, K.floatx())
+        weighted_cce = cce * weights
 
         return K.mean(weighted_cce)
 
