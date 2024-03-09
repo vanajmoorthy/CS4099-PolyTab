@@ -20,15 +20,6 @@ print("Num GPUs Available: ", len(
     tf.config.experimental.list_physical_devices('GPU')))
 
 
-def weighted_categorical_crossentropy(y_true, y_pred):
-    label_diff = K.abs(K.argmax(y_true, axis=-1) - K.argmax(y_pred, axis=-1))
-    weights = K.cast(K.less_equal(label_diff, 1), 'float32') * 0.5 + \
-        K.cast(K.greater(label_diff, 1), 'float32') * 2.0
-    cce = K.categorical_crossentropy(y_true, y_pred)
-    weighted_cce = cce * weights
-    return K.mean(weighted_cce)
-
-
 class TabCNN:
 
     def __init__(self,
@@ -125,12 +116,32 @@ class TabCNN:
             string_sm.append(K.expand_dims(K.softmax(t[:, i, :]), axis=1))
         return K.concatenate(string_sm, axis=1)
 
+    # def catcross_by_string(self, target, output):
+    #     loss = 0
+    #     for i in range(self.num_strings):
+    #         loss += K.categorical_crossentropy(
+    #             target[:, i, :], output[:, i, :])
+    #     return loss
+
     def catcross_by_string(self, target, output):
-        loss = 0
-        for i in range(self.num_strings):
-            loss += K.categorical_crossentropy(
-                target[:, i, :], output[:, i, :])
-        return loss
+        # Compute standard categorical crossentropy
+        cce = K.categorical_crossentropy(target, output)
+
+        # Compute the absolute difference between the true and predicted classes
+        true_classes = K.argmax(target, axis=-1)
+        pred_classes = K.argmax(output, axis=-1)
+        class_diff = K.abs(true_classes - pred_classes)
+
+        # Apply weighting: increase weight for larger differences
+        weights = K.switch(K.less_equal(class_diff, 1),
+                           # Lesser penalty for errors within 1 fret
+                           K.ones_like(class_diff) * 0.5,
+                           K.ones_like(class_diff) * 2.0)   # Higher penalty for errors more than 1 fret
+
+        # Apply the weights to the crossentropy loss
+        weighted_cce = cce * K.cast(weights, K.floatx())
+
+        return K.mean(weighted_cce)
 
     def avg_acc(self, y_true, y_pred):
         return K.mean(K.equal(K.argmax(y_true, axis=-1), K.argmax(y_pred, axis=-1)))
@@ -151,7 +162,7 @@ class TabCNN:
         model.add(Reshape((self.num_strings, self.num_classes)))
         model.add(Activation(self.softmax_by_string))
 
-        model.compile(loss=weighted_categorical_crossentropy,
+        model.compile(loss=self.catcross_by_string,
                       optimizer=tf.keras.optimizers.Adadelta(),
                       metrics=[self.avg_acc])
 
