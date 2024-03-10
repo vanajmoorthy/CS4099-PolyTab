@@ -16,6 +16,7 @@ import datetime
 from Metrics import *
 import tensorflow as tf
 
+K.clear_session()
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 
