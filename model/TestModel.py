@@ -25,7 +25,7 @@ SR_ORIGINAL, data = wavfile.read(AUDIO_FILE_PATH)
 
 class TestModel:
     def __init__(self,
-                 batch_size=32,
+                 batch_size=128,
                  epochs=8,
                  con_win_size=9):
         self.batch_size = batch_size

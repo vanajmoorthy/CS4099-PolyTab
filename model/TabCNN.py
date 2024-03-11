@@ -38,7 +38,7 @@ if gpus:
 class TabCNN:
 
     def __init__(self,
-                 batch_size=32,
+                 batch_size=128,
                  epochs=8,
                  con_win_size=9,
                  spec_repr="c",
