@@ -168,7 +168,7 @@ class TabCNN:
 
         # Define a function for the weight, e.g., linear increase with class_diff
         # You can adjust the slope (0.1 in this example) as necessary
-        weights = 1 + (0.1 * K.cast(class_diff, 'float32'))
+        weights = 1 + (0.05 * K.cast(class_diff, 'float32'))
 
         # Apply the weights to the crossentropy loss
         weighted_cce = cce * weights
