@@ -204,7 +204,7 @@ class PolyTab:
         self.model.fit(self.training_generator,
                        validation_data=None,
                        epochs=self.epochs,
-                       verbose=2,
+                       verbose=1,
                        use_multiprocessing=True,
                        workers=9)
 
