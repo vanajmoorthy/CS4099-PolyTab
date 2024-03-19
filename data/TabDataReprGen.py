@@ -2,95 +2,59 @@ import os
 import numpy as np
 import jams
 from scipy.io import wavfile
-import sys
 import librosa
 from tensorflow.keras.utils import to_categorical
 
 
 class TabDataReprGen:
-
-    def __init__(self, mode="c"):
-        # file path to the GuitarSet dataset
-        path = "./data/GuitarSet/"
-        self.path_audio = path + "audio/audio_mic/"
-        self.path_anno = path + "annotation/"
-
-        # labeling parameters
+    def __init__(self, mode="c", data_path="./data/GuitarSet/"):
+        self.audio_path = os.path.join(data_path, "audio/audio_mic/")
+        self.anno_path = os.path.join(data_path, "annotation/")
         self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
         self.highest_fret = 19
-        self.num_classes = self.highest_fret + 2  # for open/closed
-
-        # prepresentation and its labels storage
-        self.output = {}
-
-        # preprocessing modes
-        #
-        # c = cqt
-        # m = melspec
-        # cm = cqt + melspec
-        # s = stft
-        #
+        self.num_classes = self.highest_fret + 2
         self.downsample = True
         self.normalize = True
         self.sr_downs = 22050
-
-        # CQT parameters
         self.cqt_n_bins = 192
         self.cqt_bins_per_octave = 24
-
-        # STFT parameters
         self.n_fft = 2048
         self.hop_length = 512
-
-        # save file path
         self.save_path = "./data/spec_repr/"
 
-    def load_rep_and_labels_from_raw_file(self, filename):
-        file_audio = self.path_audio + filename + "_mic.wav"
-        file_anno = self.path_anno + filename + ".jams"
-        jam = jams.load(file_anno)
-        self.sr_original, data = wavfile.read(file_audio)
-        self.sr_curr = self.sr_original
+    def load_repr_and_labels(self, filename):
+        audio_file = os.path.join(self.audio_path, f"{filename}_mic.wav")
+        anno_file = os.path.join(self.anno_path, f"{filename}.jams")
+        jam = jams.load(anno_file)
+        sr_original, data = wavfile.read(audio_file)
+        sr_curr = sr_original
 
-        # preprocess audio, store in output dict
-        self.output["repr"] = np.swapaxes(self.preprocess_audio(data), 0, 1)
+        repr_ = self.preprocess_audio(data, sr_original, sr_curr)
+        labels = self.get_labels(jam, repr_, sr_curr)
 
-        # construct labels
-        frame_indices = range(len(self.output["repr"]))
+        return repr_, labels
+
+    def get_labels(self, jam, repr_, sr_curr):
+        frame_indices = range(len(repr_))
         times = librosa.frames_to_time(
-            frame_indices, sr=self.sr_curr, hop_length=self.hop_length)
-
-        # loop over all strings and sample annotations
+            frame_indices, sr=sr_curr, hop_length=self.hop_length)
         labels = []
+
         for string_num in range(6):
             anno = jam.annotations["note_midi"][string_num]
             string_label_samples = anno.to_samples(times)
-            # replace midi pitch values with fret numbers
-            for i in frame_indices:
-                if string_label_samples[i] == []:
-                    string_label_samples[i] = -1
-                else:
-                    string_label_samples[i] = int(
-                        round(string_label_samples[i][0]) - self.string_midi_pitches[string_num])
-            labels.append([string_label_samples])
+            string_labels = [-1 if not label else int(round(label[0]) - self.string_midi_pitches[string_num])
+                             for label in string_label_samples]
+            labels.append(string_labels)
 
         labels = np.array(labels)
-        # remove the extra dimension
-        labels = np.squeeze(labels)
         labels = np.swapaxes(labels, 0, 1)
-
-        # clean labels
         labels = self.clean_labels(labels)
 
-        # store and return
-        self.output["labels"] = labels
-        return len(labels)
+        return labels
 
     def correct_numbering(self, n):
-        n += 1
-        if n < 0 or n > self.highest_fret:
-            n = 0
-        return n
+        return max(min(n + 1, self.highest_fret), 0)
 
     def categorical(self, label):
         return to_categorical(label, self.num_classes)
@@ -102,50 +66,45 @@ class TabDataReprGen:
     def clean_labels(self, labels):
         return np.array([self.clean_label(label) for label in labels])
 
-    def preprocess_audio(self, data):
+    def preprocess_audio(self, data, sr_original, sr_curr):
         data = data.astype(float)
         if self.normalize:
             data = librosa.util.normalize(data)
         if self.downsample:
             data = librosa.resample(
-                data, orig_sr=self.sr_original, target_sr=self.sr_downs)
-            self.sr_curr = self.sr_downs
+                data, orig_sr=sr_original, target_sr=self.sr_downs)
+            sr_curr = self.sr_downs
 
-            data = np.abs(librosa.cqt(data,
-                                      hop_length=self.hop_length,
-                                      sr=self.sr_curr,
-                                      n_bins=self.cqt_n_bins,
-                                      bins_per_octave=self.cqt_bins_per_octave))
+        data = np.abs(librosa.cqt(data,
+                                  hop_length=self.hop_length,
+                                  sr=sr_curr,
+                                  n_bins=self.cqt_n_bins,
+                                  bins_per_octave=self.cqt_bins_per_octave))
 
-        return data
+        return np.swapaxes(data, 0, 1)
 
-    def save_data(self, filename):
-        np.savez(filename, **self.output)
+    def save_data(self, filename, repr_, labels):
+        np.savez(os.path.join(self.save_path,
+                 f"{filename}.npz"), repr=repr_, labels=labels)
 
-    def get_nth_filename(self, n):
-        # returns the filename with no extension
-        filenames = np.sort(np.array(os.listdir(self.path_anno)))
-        filenames = list(filter(lambda x: x[-5:] == ".jams", filenames))
-        print(n)
-        return filenames[n][:-5]
+    def get_filenames(self):
+        filenames = [f[:-5]
+                     for f in os.listdir(self.anno_path) if f.endswith(".jams")]
+        return sorted(filenames)
 
-    def load_and_save_repr_nth_file(self, n):
-        # filename has no extenstion
-        filename = self.get_nth_filename(n)
-        num_frames = self.load_rep_and_labels_from_raw_file(filename)
-        print("done: " + filename + ", " + str(num_frames) + " frames")
-        save_path = self.save_path
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        self.save_data(save_path + filename + ".npz")
+    def process_file(self, n):
+        filename = self.get_filenames()[n]
+        repr_, labels = self.load_repr_and_labels(filename)
+        self.save_data(filename, repr_, labels)
+        print(f"Processed: {filename}, {len(labels)} frames")
 
 
-def main(arg1, arg2):
-    n = arg1
-    m = arg2
-    gen = TabDataReprGen(mode=m)
-    gen.load_and_save_repr_nth_file(n)
+def main(n, mode):
+    gen = TabDataReprGen(mode)
+    gen.process_file(n)
 
 
 if __name__ == "__main__":
-    main(args)
+    n = int(sys.argv[1])
+    mode = sys.argv[2] if len(sys.argv) > 2 else "c"
+    main(n, mode)
