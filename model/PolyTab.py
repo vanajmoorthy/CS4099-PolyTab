@@ -35,7 +35,7 @@ if gpus:
         print(e)
 
 
-class TabCNN:
+class PolyTab:
 
     def __init__(self,
                  batch_size=128,
@@ -245,24 +245,24 @@ class TabCNN:
 ########### EXPERIMENT ###########
 ##################################
 if __name__ == '__main__':
-    tabcnn = TabCNN()
+    polytab = PolyTab()
 
     print("logging model...")
-    tabcnn.build_model()
-    tabcnn.log_model()
+    polytab.build_model()
+    polytab.log_model()
 
     for fold in range(6):
         print("\nfold " + str(fold))
-        tabcnn.partition_data(fold)
+        polytab.partition_data(fold)
         print("building model...")
-        tabcnn.build_model()
+        polytab.build_model()
         print("training...")
-        tabcnn.train()
-        tabcnn.save_weights()
+        polytab.train()
+        polytab.save_weights()
         print("testing...")
-        tabcnn.test()
-        tabcnn.save_predictions()
+        polytab.test()
+        polytab.save_predictions()
         print("evaluation...")
-        tabcnn.evaluate()
+        polytab.evaluate()
     print("saving results...")
-    tabcnn.save_results_csv()
+    polytab.save_results_csv()

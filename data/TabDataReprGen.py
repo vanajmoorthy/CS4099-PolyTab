@@ -7,7 +7,7 @@ from tensorflow.keras.utils import to_categorical
 
 
 class TabDataReprGen:
-    def __init__(self, mode="c", data_path="./data/GuitarSet/"):
+    def __init__(self, data_path="./data/GuitarSet/"):
         self.audio_path = os.path.join(data_path, "audio/audio_mic/")
         self.anno_path = os.path.join(data_path, "annotation/")
         self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
