@@ -15,7 +15,6 @@ import numpy as np
 import datetime
 from Metrics import *
 import tensorflow as tf
-from keras.callbacks import ModelCheckpoint, EarlyStopping, TensorBoard
 
 K.clear_session()
 
@@ -202,41 +201,12 @@ class TabCNN:
         self.model = model
 
     def train(self):
-        try:
-            checkpoint_dir = self.save_folder + 'checkpoints/'
-            if not os.path.exists(checkpoint_dir):
-                os.makedirs(checkpoint_dir)
-
-            # Callbacks
-            model_checkpoint_callback = ModelCheckpoint(
-                filepath=checkpoint_dir +
-                'checkpoint-{epoch:02d}-{val_loss:.2f}.h5',
-                save_weights_only=True,
-                monitor='val_loss',
-                mode='min',
-                save_best_only=True)
-
-            early_stopping_callback = EarlyStopping(
-                monitor='val_loss', patience=3)
-
-            tensorboard_callback = TensorBoard(
-                log_dir=self.save_folder + 'logs/', histogram_freq=1)
-
-            callbacks_list = [model_checkpoint_callback,
-                              early_stopping_callback, tensorboard_callback]
-
-            history = self.model.fit(self.training_generator,
-                                     validation_data=None,
-                                     epochs=self.epochs,
-                                     verbose=3,
-                                     use_multiprocessing=True,
-                                     workers=9)
-
-            print(f"Starting training for fold {self.data_split}")
-            print(f"Completed training for fold {self.data_split}")
-            return history
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        self.model.fit(self.training_generator,
+                       validation_data=None,
+                       epochs=self.epochs,
+                       verbose=2,
+                       use_multiprocessing=True,
+                       workers=9)
 
     def save_weights(self):
         self.model.save_weights(self.split_folder + "weights.h5")
