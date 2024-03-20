@@ -150,8 +150,8 @@ class PolyTab:
 
         # Ensure the operations are compatible with TensorFlow's dtype by casting to float
         weights = K.switch(K.less_equal(class_diff, 1),
-                           K.cast(K.ones_like(class_diff), 'float32') * 0.1,
-                           K.cast(K.ones_like(class_diff), 'float32') * 1.0)
+                           K.cast(K.ones_like(class_diff), 'float32') * 0.5,
+                           K.cast(K.ones_like(class_diff), 'float32') * 1.2)
 
         # Apply the weights to the crossentropy loss
         weighted_cce = cce * weights
