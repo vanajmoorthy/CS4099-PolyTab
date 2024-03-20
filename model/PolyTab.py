@@ -15,8 +15,9 @@ import numpy as np
 import datetime
 from Metrics import *
 import tensorflow as tf
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import TensorBoard
 
-K.clear_session()
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 
@@ -131,31 +132,12 @@ class PolyTab:
             string_sm.append(K.expand_dims(K.softmax(t[:, i, :]), axis=1))
         return K.concatenate(string_sm, axis=1)
 
-    # def catcross_by_string(self, target, output):
-    #     loss = 0
-    #     for i in range(self.num_strings):
-    #         loss += K.categorical_crossentropy(
-    #             target[:, i, :], output[:, i, :])
-    #     return loss
-
-    # def catcross_by_string(self, target, output):
-    #     # Compute standard categorical crossentropy
-    #     cce = K.categorical_crossentropy(target, output)
-
-    #     # Compute the absolute difference between the true and predicted classes
-    #     true_classes = K.argmax(target, axis=-1)
-    #     pred_classes = K.argmax(output, axis=-1)
-    #     class_diff = K.abs(true_classes - pred_classes)
-
-    #     # Ensure the operations are compatible with TensorFlow's dtype by casting to float
-    #     weights = K.switch(K.less_equal(class_diff, 1),
-    #                        K.cast(K.ones_like(class_diff), 'float32') * 0.5,
-    #                        K.cast(K.ones_like(class_diff), 'float32') * 1.5)
-
-    #     # Apply the weights to the crossentropy loss
-    #     weighted_cce = cce * weights
-
-    #     return K.mean(weighted_cce)
+    def catcross_by_string(self, target, output):
+        loss = 0
+        for i in range(self.num_strings):
+            loss += K.categorical_crossentropy(
+                target[:, i, :], output[:, i, :])
+        return loss
 
     def catcross_by_string(self, target, output):
         # Compute standard categorical crossentropy
@@ -166,14 +148,33 @@ class PolyTab:
         pred_classes = K.argmax(output, axis=-1)
         class_diff = K.abs(true_classes - pred_classes)
 
-        # Define a function for the weight, e.g., linear increase with class_diff
-        # You can adjust the slope (0.1 in this example) as necessary
-        weights = 1 + (0.01 * K.cast(class_diff, 'float32'))
+        # Ensure the operations are compatible with TensorFlow's dtype by casting to float
+        weights = K.switch(K.less_equal(class_diff, 1),
+                           K.cast(K.ones_like(class_diff), 'float32') * 0.1,
+                           K.cast(K.ones_like(class_diff), 'float32') * 1.0)
 
         # Apply the weights to the crossentropy loss
         weighted_cce = cce * weights
 
         return K.mean(weighted_cce)
+
+    # def catcross_by_string(self, target, output):
+    #     # Compute standard categorical crossentropy
+    #     cce = K.categorical_crossentropy(target, output)
+
+    #     # Compute the absolute difference between the true and predicted classes
+    #     true_classes = K.argmax(target, axis=-1)
+    #     pred_classes = K.argmax(output, axis=-1)
+    #     class_diff = K.abs(true_classes - pred_classes)
+
+    #     # Define a function for the weight, e.g., linear increase with class_diff
+    #     # You can adjust the slope (0.1 in this example) as necessary
+    #     weights = 1 + (0.01 * K.cast(class_diff, 'float32'))
+
+    #     # Apply the weights to the crossentropy loss
+    #     weighted_cce = cce * weights
+
+    #     return K.mean(weighted_cce)
 
     def avg_acc(self, y_true, y_pred):
         return K.mean(K.equal(K.argmax(y_true, axis=-1), K.argmax(y_pred, axis=-1)))
@@ -201,12 +202,28 @@ class PolyTab:
         self.model = model
 
     def train(self):
-        self.model.fit(self.training_generator,
-                       validation_data=None,
-                       epochs=self.epochs,
-                       verbose=1,
-                       use_multiprocessing=True,
-                       workers=9)
+        # Set up TensorBoard logging directory
+        tensorboard_dir = os.path.join(self.save_folder, 'tensorboard_logs')
+        os.makedirs(tensorboard_dir, exist_ok=True)
+        tensorboard_callback = TensorBoard(log_dir=tensorboard_dir)
+
+        checkpoint_filepath = self.save_folder + 'checkpoint.h5'
+        model_checkpoint_callback = ModelCheckpoint(
+            filepath=checkpoint_filepath,
+            save_weights_only=True,
+            # You might want to change this to 'loss' if you don't have a validation set.
+            monitor='loss',
+            mode='min',
+            save_best_only=True)
+
+        self.model.fit(
+            self.training_generator,
+            validation_data=None,  # Or your validation data
+            epochs=self.epochs,
+            verbose=1,
+            callbacks=[model_checkpoint_callback, tensorboard_callback],
+            use_multiprocessing=True,
+            workers=9)
 
     def save_weights(self):
         self.model.save_weights(self.split_folder + "weights.h5")
@@ -252,6 +269,7 @@ if __name__ == '__main__':
     polytab.log_model()
 
     for fold in range(6):
+        K.clear_session()
         print("\nfold " + str(fold))
         polytab.partition_data(fold)
         print("building model...")
