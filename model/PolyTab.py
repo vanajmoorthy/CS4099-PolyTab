@@ -139,7 +139,7 @@ class PolyTab:
                                                   spec_repr=self.spec_repr,
                                                   con_win_size=self.con_win_size)
 
-        self.split_folder = self.save_folder + str(self.data_split) + "/"
+        self.split_folder = self.save_folder + Wstr(self.data_split) + "/"
         if not os.path.exists(self.split_folder):
             os.makedirs(self.split_folder)
 
@@ -223,9 +223,10 @@ class PolyTab:
         model.add(Reshape((self.num_strings, self.num_classes)))
         model.add(Activation(self.softmax_by_string))
         loss_layer = LearnableWeightedLoss()
-        model.add_loss(loss_layer(model.targets[0], model.output))
+
         model.compile(optimizer=tf.keras.optimizers.Adadelta(),
-                      metrics=[self.avg_acc])
+                      metrics=[self.avg_acc],
+                      loss=loss_layer.call)
 
         self.model = model
 
