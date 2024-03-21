@@ -75,13 +75,21 @@ class PolyTabPredictor:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             audio_filename = os.path.basename(audio_file)
-            output_file = os.path.join(
-                output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
-            with open(output_file, "w") as f:
+            raw_predictions_file = os.path.join(output_dir, f"{os.path.splitext(audio_filename)[0]}_raw_predictions.txt")
+            tabs_file = os.path.join(output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
+
+            # Save raw predictions
+            with open(raw_predictions_file, "w") as rp_file:
+                for frame_idx, raw_prediction in enumerate(predictions):
+                    rp_file.write(f"Frame {frame_idx}: {raw_prediction}\n")
+
+            # Save mapped predictions (tabs)
+            with open(tabs_file, "w") as tf_file:
                 for frame_idx, tab_frame in enumerate(tabs):
-                    f.write(f"Frame {frame_idx}: {' '.join(map(str, tab_frame))}\n")
+                    tf_file.write(f"Frame {frame_idx}: {' '.join(map(str, tab_frame))}\n")
 
         return tabs
+
 
     def predictions_to_tabs(self, predictions):
         tabs = []
@@ -99,6 +107,7 @@ class PolyTabPredictor:
 
 
 # Example usage
+np.set_printoptions(suppress=True, precision=8)
 model_weights_path = 'saved/c 2024-03-20 182510/5/weights.h5'
 audio_file = '00_BN1-147-Gb_solo_mic.wav'
 
