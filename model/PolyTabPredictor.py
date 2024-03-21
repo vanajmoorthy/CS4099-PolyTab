@@ -67,20 +67,33 @@ class PolyTabPredictor:
                 np.swapaxes(sample_x, 0, 1), 0), -1)
             prediction = self.model.predict(sample_x)
             predictions.append(prediction[0])
-            # Print the prediction for each frame
-            print(f"Frame {frame_idx}: {prediction[0]}")
 
-        predictions = np.array(predictions)
+        # Convert predictions to guitar tabs format
+        tabs = self.predictions_to_tabs(predictions)
 
         if output_dir:
             audio_filename = os.path.basename(audio_file)
             output_file = os.path.join(
-                output_dir, f"{os.path.splitext(audio_filename)[0]}_predictions.txt")
+                output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
             with open(output_file, "w") as f:
-                for frame_idx, prediction in enumerate(predictions):
-                    f.write(f"Frame {frame_idx}: {prediction}\n")
+                for tab in tabs:
+                    # Write each frame's tab as a space-separated string
+                    f.write(' '.join(tab) + '\n')
 
-        return predictions
+    def predictions_to_tabs(self, predictions):
+        tabs = []
+        for frame in predictions:  # Iterate through each frame of predictions
+            frame_tabs = []
+            for string_prediction in frame:  # Iterate through each string prediction in the frame
+                # Get index of max prediction value
+                fret = np.argmax(string_prediction)
+                if fret == 0:
+                    frame_tabs.append('x')  # 'x' for 'no play'
+                else:
+                    # Convert fret number to string, adjusting for 'no play' at index 0
+                    frame_tabs.append(str(fret - 1))
+            tabs.append(frame_tabs)
+        return tabs
 
 
 # Example usage
