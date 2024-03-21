@@ -56,7 +56,7 @@ class PolyTabPredictor:
                                   n_bins=self.cqt_n_bins, bins_per_octave=self.cqt_bins_per_octave))
         return np.swapaxes(data, 0, 1)
 
-    def predict(self, audio_file, output_file=None):
+    def predict(self, audio_file, output_dir=None):
         repr_ = self.preprocess_audio(audio_file)
         full_x = np.pad(
             repr_, [(self.con_win_size // 2, self.con_win_size // 2), (0, 0)], mode='constant')
@@ -72,7 +72,10 @@ class PolyTabPredictor:
 
         predictions = np.array(predictions)
 
-        if output_file:
+        if output_dir:
+            audio_filename = os.path.basename(audio_file)
+            output_file = os.path.join(
+                output_dir, f"{os.path.splitext(audio_filename)[0]}_predictions.txt")
             with open(output_file, "w") as f:
                 for frame_idx, prediction in enumerate(predictions):
                     f.write(f"Frame {frame_idx}: {prediction}\n")
@@ -85,5 +88,6 @@ model_weights_path = 'saved/c 2024-03-20 182510/5/weights.h5'
 audio_file = '00_BN1-147-Gb_solo_mic.wav'
 
 predictor = PolyTabPredictor(model_weights_path)
-predictions = predictor.predict(audio_file, output_file=f"{
-                                audio_file}_predictions.txt")
+
+output_dir = "predictions"
+predictions = predictor.predict(audio_file, output_dir=output_dir)
