@@ -80,7 +80,7 @@ class PolyTabPredictor:
             with open(output_file, "w") as f:
                 for frame_idx, tab_frame in enumerate(tabs):
                     f.write(f"Frame {frame_idx}: {
-                            ' '.join(map(str, tab_frame))}\n")
+                            ' '.join(map(str, tab_frame))}")
 
         return tabs
 
