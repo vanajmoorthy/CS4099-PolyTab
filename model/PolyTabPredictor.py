@@ -69,7 +69,7 @@ class PolyTabPredictor:
             predictions.append(prediction[0])
 
         # Convert predictions to guitar tabs format
-        tabs = self.predictions_to_tabs(predictions)
+        tabs = self.map_predictions_to_fretboard(predictions)
 
         if output_dir:
             audio_filename = os.path.basename(audio_file)
