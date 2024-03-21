@@ -66,7 +66,6 @@ class PolyTabPredictor:
             sample_x = np.expand_dims(np.expand_dims(
                 np.swapaxes(sample_x, 0, 1), 0), -1)
             prediction = self.model.predict(sample_x)
-            print(type(predictions))
             predictions.append(prediction[0])
 
         # Convert predictions to guitar tabs format
@@ -82,14 +81,17 @@ class PolyTabPredictor:
                     f.write(' '.join(tab) + '\n')
 
     def map_predictions_to_fretboard(self, predictions):
-        # Reshape to get individual string predictions
-        string_preds = predictions.reshape(-1, 6, predictions.shape[-1])
+        # Handle predictions as a list
+        # Assuming all sublists have same length
+        num_timesteps = len(predictions[0])
+        string_preds = [[pred[i] for pred in predictions]
+                        for i in range(num_timesteps)]
 
         fretboard_predictions = []
         for string_num in range(6):
             string_data = []
             for time_step in range(len(string_preds)):
-                predicted_class = string_preds[time_step, string_num]
+                predicted_class = string_preds[time_step][string_num]
                 # Apply correction (assuming highest_fret=19)
                 fret = max(min(predicted_class + 1, 19), 0)
                 if fret == -1:  # Handle rest state
