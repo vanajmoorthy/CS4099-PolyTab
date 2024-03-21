@@ -66,6 +66,7 @@ class PolyTabPredictor:
             sample_x = np.expand_dims(np.expand_dims(
                 np.swapaxes(sample_x, 0, 1), 0), -1)
             prediction = self.model.predict(sample_x)
+            print(type(predictions))
             predictions.append(prediction[0])
 
         # Convert predictions to guitar tabs format
