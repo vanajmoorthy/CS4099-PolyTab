@@ -15,6 +15,7 @@ class PolyTabPredictor:
         self.cqt_bins_per_octave = 24
         self.n_fft = 2048
         self.hop_length = 512
+        self.sr_downs = 22050
         self.num_classes = 21
         self.num_strings = 6
         self.input_shape = (192, self.con_win_size, 1)
