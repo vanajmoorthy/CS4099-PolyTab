@@ -63,7 +63,8 @@ class PolyTabPredictor:
         predictions = []
         for frame_idx in range(len(repr_)):
             sample_x = full_x[frame_idx:frame_idx + self.con_win_size]
-            sample_x = np.expand_dims(np.expand_dims(sample_x, 0), -1)
+            sample_x = np.expand_dims(np.expand_dims(
+                np.swapaxes(sample_x, 0, 1), 0), -1)
             prediction = self.model.predict(sample_x)
             predictions.append(prediction[0])
         return np.array(predictions)
