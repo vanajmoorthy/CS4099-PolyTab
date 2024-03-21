@@ -196,7 +196,11 @@ class PolyTab:
         model.add(Activation(self.softmax_by_string))
         loss_layer = LearnableWeightedLoss()
 
-        model.compile(optimizer=tf.keras.optimizers.Adadelta(),
+        # model.compile(optimizer=tf.keras.optimizers.Adadelta(),
+        #               metrics=[self.avg_acc],
+        #               loss=loss_layer.call)
+
+        model.compile(optimizer=tf.keras.optimizers.AdamW(learning_rate=0.01, weight_decay=1e-4),
                       metrics=[self.avg_acc],
                       loss=loss_layer.call)
 

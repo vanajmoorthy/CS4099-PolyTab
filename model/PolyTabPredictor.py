@@ -1,3 +1,4 @@
+import argparse
 import os
 import numpy as np
 import librosa
@@ -107,12 +108,21 @@ class PolyTabPredictor:
         return tabs
 
 
-# Example usage
-np.set_printoptions(suppress=True, precision=8)
-model_weights_path = 'saved/c 2024-03-20 182510/5/weights.h5'
-audio_file = '00_BN1-147-Gb_solo_mic.wav'
+if __name__ == '__main__':
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Predict guitar tabs from audio file.')
+    parser.add_argument('--weights', required=True, help='Path to the model weights file.')
+    parser.add_argument('--audio', required=True, help='Path to the audio file.')
+    args = parser.parse_args()
 
-predictor = PolyTabPredictor(model_weights_path)
+    # Set numpy print options to suppress scientific notation and increase precision
+    np.set_printoptions(suppress=True, precision=8)
 
-output_dir = "predictions"
-predictions = predictor.predict(audio_file, output_dir=output_dir)
+    # Use the provided arguments
+    model_weights_path = args.weights
+    audio_file = args.audio
+    output_dir = "predictions"
+
+    # Initialize and use your predictor
+    predictor = PolyTabPredictor(model_weights_path)
+    predictions = predictor.predict(audio_file, output_dir=output_dir)
