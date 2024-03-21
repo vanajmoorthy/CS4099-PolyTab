@@ -69,38 +69,33 @@ class PolyTabPredictor:
             predictions.append(prediction[0])
 
         # Convert predictions to guitar tabs format
-        tabs = self.map_predictions_to_fretboard(predictions)
+        tabs = self.predictions_to_tabs(predictions)
 
         if output_dir:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
             audio_filename = os.path.basename(audio_file)
             output_file = os.path.join(
                 output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
             with open(output_file, "w") as f:
-                for tab in tabs:
-                    # Write each frame's tab as a space-separated string
-                    f.write(' '.join(tab) + '\n')
+                for frame_idx, tab_frame in enumerate(tabs):
+                    f.write(f"Frame {frame_idx}: {
+                            ' '.join(map(str, tab_frame))}\n")
 
-    def map_predictions_to_fretboard(self, predictions):
-        # Handle predictions as a list
-        # Assuming all sublists have same length
-        num_timesteps = len(predictions[0])
-        string_preds = [[pred[i] for pred in predictions]
-                        for i in range(num_timesteps)]
+        return tabs
 
-        fretboard_predictions = []
-        for string_num in range(6):
-            string_data = []
-            for time_step in range(len(string_preds)):
-                predicted_class = string_preds[time_step][string_num]
-                # Apply correction (assuming highest_fret=19)
-                fret = max(min(predicted_class + 1, 19), 0)
-                if fret == -1:  # Handle rest state
-                    fret = 0
-                # Add tuple with (string, fret)
-                string_data.append((string_num, fret))
-                fretboard_predictions.append(string_data)
-
-        return fretboard_predictions
+    def predictions_to_tabs(self, predictions):
+        tabs = []
+        for frame in predictions:
+            tab_frame = []
+            for string_predictions in frame:
+                # Get the fret with the highest probability
+                fret = np.argmax(string_predictions)
+                # Convert fret number to string representation if necessary
+                # Convert to string for easy file writing
+                tab_frame.append(str(fret))
+            tabs.append(tab_frame)
+        return tabs
 
 
 # Example usage
