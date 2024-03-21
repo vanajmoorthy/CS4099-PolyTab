@@ -79,8 +79,7 @@ class PolyTabPredictor:
                 output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
             with open(output_file, "w") as f:
                 for frame_idx, tab_frame in enumerate(tabs):
-                    f.write(f"Frame {frame_idx}: {
-                            ' '.join(map(str, tab_frame))}")
+                    f.write(f"Frame {frame_idx}: {' '.join(map(str, tab_frame))}\n")
 
         return tabs
 
