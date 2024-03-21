@@ -85,16 +85,20 @@ class PolyTabPredictor:
 
     def predictions_to_tabs(self, predictions):
         tabs = []
+        threshold = 0.7  # Adjust this value based on your model's behavior
         for frame in predictions:
             tab_frame = []
             for string_predictions in frame:
-                # Get the fret with the highest probability
-                fret = np.argmax(string_predictions)
+                # Apply threshold on maximum probability
+                if np.max(string_predictions) > threshold:
+                    fret = np.argmax(string_predictions)
+                else:
+                    fret = 0  # Rest state if probability below threshold
                 # Convert fret number to string representation if necessary
                 # Convert to string for easy file writing
                 tab_frame.append(str(fret))
             tabs.append(tab_frame)
-        return tabs
+        return tabs 
 
 
 # Example usage
