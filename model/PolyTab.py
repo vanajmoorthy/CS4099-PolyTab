@@ -11,7 +11,7 @@ from keras.layers import Conv2D, MaxPooling2D, Conv1D, Lambda
 from keras import backend as K
 from DataGenerator import DataGenerator
 import pandas as pd
-from model.LearnableWeightedLoss import LearnableWeightedLoss
+from LearnableWeightedLoss import LearnableWeightedLoss
 import numpy as np
 import datetime
 from Metrics import *
