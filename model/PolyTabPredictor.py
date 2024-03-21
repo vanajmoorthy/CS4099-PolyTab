@@ -81,7 +81,8 @@ class PolyTabPredictor:
             # Save raw predictions
             with open(raw_predictions_file, "w") as rp_file:
                 for frame_idx, raw_prediction in enumerate(predictions):
-                    rp_file.write(f"Frame {frame_idx}: {raw_prediction}\n")
+                    formatted_prediction = np.array2string(raw_prediction, separator=', ', suppress_small=True)
+                    rp_file.write(f"Frame {frame_idx}: {formatted_prediction}\n")
 
             # Save mapped predictions (tabs)
             with open(tabs_file, "w") as tf_file:
