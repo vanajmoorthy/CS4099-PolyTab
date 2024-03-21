@@ -80,20 +80,24 @@ class PolyTabPredictor:
                     # Write each frame's tab as a space-separated string
                     f.write(' '.join(tab) + '\n')
 
-    def predictions_to_tabs(self, predictions):
-        tabs = []
-        for frame in predictions:  # Iterate through each frame of predictions
-            frame_tabs = []
-            for string_prediction in frame:  # Iterate through each string prediction in the frame
-                # Get index of max prediction value
-                fret = np.argmax(string_prediction)
-                if fret == 0:
-                    frame_tabs.append('x')  # 'x' for 'no play'
-                else:
-                    # Convert fret number to string, adjusting for 'no play' at index 0
-                    frame_tabs.append(str(fret - 1))
-            tabs.append(frame_tabs)
-        return tabs
+    def map_predictions_to_fretboard(self, predictions):
+        # Reshape to get individual string predictions
+        string_preds = predictions.reshape(-1, 6, predictions.shape[-1])
+
+        fretboard_predictions = []
+        for string_num in range(6):
+            string_data = []
+            for time_step in range(len(string_preds)):
+                predicted_class = string_preds[time_step, string_num]
+                # Apply correction (assuming highest_fret=19)
+                fret = max(min(predicted_class + 1, 19), 0)
+                if fret == -1:  # Handle rest state
+                    fret = 0
+                # Add tuple with (string, fret)
+                string_data.append((string_num, fret))
+                fretboard_predictions.append(string_data)
+
+        return fretboard_predictions
 
 
 # Example usage
