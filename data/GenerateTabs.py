@@ -44,6 +44,7 @@ def process_annotations(file_name):
                 tab_lines[string_num].append(fret)
 
     # Write the tab to a text file, with each string on its own line
+    print(tab_lines)
     format_and_save_tab(file_name.replace('.jams', ''), tab_lines)
 
 # List of MIDI notes for standard guitar strings
