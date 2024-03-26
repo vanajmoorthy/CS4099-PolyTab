@@ -25,7 +25,7 @@ def process_annotations(file_name):
             string_num = None
             # Determine which string this note belongs to
             for i, string_midi in enumerate(string_midi_pitches):
-                if abs(note.value - string_midi) < 3:  # threshold for string matching
+                if abs(note.value - string_midi) < 6:  # threshold for string matching
                     string_num = i
                     break
             if string_num is not None:
