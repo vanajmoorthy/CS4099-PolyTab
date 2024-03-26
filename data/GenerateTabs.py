@@ -44,6 +44,8 @@ for file_name in os.listdir(data_path):
             # Get the annotations for each string
             string_annotations = get_string_notes(jam.annotations['note_midi'][0], string_midi)
             print(string_annotations)
+            print(jam.annotations['note_midi'][0])
+
         
         # Save the tab for the song
         save_tab(file_name.split('.')[0], string_annotations)
