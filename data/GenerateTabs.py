@@ -29,23 +29,33 @@ def format_and_save_tab(file_name, annotations):
 # Load JAMS annotation and convert to guitar tabs
 def process_annotations(file_name):
     jam = jams.load(os.path.join(data_path, file_name))
-    tab_lines = [[] for _ in range(6)]  # one sublist for each string
-
+    # Determine the max number of notes across all strings to ensure alignment
+    max_notes = 0
+    for string_midi in string_midi_pitches:
+        notes = [note for ann in jam.annotations['note_midi'] for note in ann.data if abs(note.value - string_midi) < 6]
+        if len(notes) > max_notes:
+            max_notes = len(notes)
+    
+    # Initialize tab_lines with placeholders for no note played
+    tab_lines = [['X' for _ in range(max_notes)] for _ in range(6)]
+    
     for ann in jam.annotations['note_midi']:
-        for note in ann:
+        for note in ann.data:
             string_num = None
-            # Determine which string this note belongs to
             for i, string_midi in enumerate(string_midi_pitches):
                 if abs(note.value - string_midi) < 6:  # threshold for string matching
                     string_num = i
                     break
             if string_num is not None:
                 fret = convert_note_to_fret(note.value, string_midi_pitches[string_num])
-                tab_lines[string_num].append(fret)
-
-    # Write the tab to a text file, with each string on its own line
+                # Find the next available slot (X) in the corresponding string line
+                next_slot = tab_lines[string_num].index('X')
+                tab_lines[string_num][next_slot] = fret if fret != 'X' else '0'  # Replace 'X' with '0' if fret is not playable
+    
     print(tab_lines)
+    # Now that tab_lines are filled, format and save the tab
     format_and_save_tab(file_name.replace('.jams', ''), tab_lines)
+
 
 # List of MIDI notes for standard guitar strings
 string_midi_pitches = [40, 45, 50, 55, 59, 64]
