@@ -56,7 +56,7 @@ class DataGenerator(Sequence):
         for i, ID in enumerate(list_IDs_temp):
 
             # determine filename
-            data_dir = self.data_path + self.spec_repr + "/"
+            data_dir = self.data_path + "/"
             filename = "_".join(ID.split("_")[:-1]) + ".npz"
             frame_idx = int(ID.split("_")[-1])
 
