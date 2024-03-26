@@ -1,1 +1,1 @@
-nohup python ./data/Parallel_GenerateCQTs.py &
+nohup python data/Parallel_GenerateCQTs.py &
