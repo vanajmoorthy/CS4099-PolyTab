@@ -15,6 +15,13 @@ def convert_note_to_tab(note, string_midi):
         return None
     return fret
 
+def get_string_notes(annotations, string_midi):
+    string_notes = []
+    for note in annotations:
+        if note.value == string_midi:
+            string_notes.append(note)
+    return string_notes
+
 def save_tab(file_name, annotations):
     with open(os.path.join(save_path, f"{file_name}.txt"), "w") as f:
         for string_annotations in annotations:
@@ -35,13 +42,9 @@ for file_name in os.listdir(data_path):
         
         for string_midi in string_midi_pitches:
             # Get the annotations for each string
+            print(string_midi)
             print(jam.search(namespace='note_midi'))
-            string_notes = jam.search(namespace='note_midi')[string_midi].data
-            string_annotations = []
-            for note in string_notes:
-                fret = convert_note_to_tab(note.value, string_midi)
-                string_annotations.append(fret)
-            annotations.append(string_annotations)
+            string_annotations = get_string_notes(jam.annotations['note_midi'][0], string_midi)
         
         # Save the tab for the song
         save_tab(file_name.split('.')[0], annotations)
