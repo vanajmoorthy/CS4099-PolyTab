@@ -32,9 +32,11 @@ for file_name in os.listdir(data_path):
         # Load JAMS annotation
         jam = jams.load(os.path.join(data_path, file_name))
         annotations = []
+        print(jam)
         
         for string_midi in string_midi_pitches:
             # Get the annotations for each string
+            print(jam.search(namespace='note_midi'))
             string_notes = jam.search(namespace='note_midi')[string_midi].data
             string_annotations = []
             for note in string_notes:
