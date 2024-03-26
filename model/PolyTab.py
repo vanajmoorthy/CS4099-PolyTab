@@ -43,7 +43,7 @@ class PolyTab:
                  epochs=8,
                  con_win_size=9,
                  spec_repr="c",
-                 data_path="./data/spec_repr/",
+                 data_path="./data/cqt/",
                  id_file="id.csv",
                  save_path="./model/saved/"):
 
