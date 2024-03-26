@@ -1,4 +1,4 @@
-from TabDataReprGen import main
+from GenerateCQTs import main
 from multiprocessing import Pool
 import sys
 

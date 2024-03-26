@@ -6,7 +6,7 @@ import librosa
 from tensorflow.keras.utils import to_categorical
 
 
-class TabDataReprGen:
+class GenerateCQTs:
     def __init__(self, data_path="./data/GuitarSet/"):
         self.audio_path = os.path.join(data_path, "audio/audio_mic/")
         self.anno_path = os.path.join(data_path, "annotation/")
@@ -20,7 +20,7 @@ class TabDataReprGen:
         self.cqt_bins_per_octave = 24
         self.n_fft = 2048
         self.hop_length = 512
-        self.save_path = "./data/spec_repr/"
+        self.save_path = "./data/cqt/"
 
     def load_repr_and_labels(self, filename):
         audio_file = os.path.join(self.audio_path, f"{filename}_mic.wav")
@@ -100,7 +100,7 @@ class TabDataReprGen:
 
 
 def main(n):
-    gen = TabDataReprGen()
+    gen = GenerateCQTs()
     gen.process_file(n)
 
 
