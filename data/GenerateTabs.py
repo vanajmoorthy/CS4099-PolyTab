@@ -15,6 +15,17 @@ def convert_note_to_fret(midi_note, string_midi_pitch):
         return str(fret_number)
     return 'X'  # 'X' indicates a note that is not playable on this string
 
+
+def format_and_save_tab(file_name, annotations):
+    # Assuming `annotations` is a list of lists, where each sublist is a string's frets over time
+    num_frames = len(annotations[0])  # Assuming all strings have the same number of frames
+
+    with open(os.path.join(save_path, f"{file_name}_formatted_tab.txt"), 'w') as f:
+        for frame_idx in range(num_frames):
+            f.write(f"Frame {frame_idx}: ")
+            frame_frets = [str(annotations[string_idx][frame_idx]) if annotations[string_idx][frame_idx] != 'X' else '0' for string_idx in range(6)]
+            f.write(' '.join(frame_frets) + '\n')
+
 # Load JAMS annotation and convert to guitar tabs
 def process_annotations(file_name):
     jam = jams.load(os.path.join(data_path, file_name))
@@ -33,9 +44,7 @@ def process_annotations(file_name):
                 tab_lines[string_num].append(fret)
 
     # Write the tab to a text file, with each string on its own line
-    with open(os.path.join(save_path, f"{os.path.splitext(file_name)[0]}_tab.txt"), 'w') as fp:
-        for string_frets in tab_lines:
-            fp.write(' '.join(string_frets) + '\n')
+    format_and_save_tab(file_name.replace('.jams', ''), tab_lines)
 
 # List of MIDI notes for standard guitar strings
 string_midi_pitches = [40, 45, 50, 55, 59, 64]
