@@ -38,7 +38,7 @@ for file_name in os.listdir(data_path):
     if file_name.endswith(".jams"):
         # Load JAMS annotation
         jam = jams.load(os.path.join(data_path, file_name))
-        annotations = []
+        string_annotations = []
         
         for string_midi in string_midi_pitches:
             # Get the annotations for each string
@@ -46,5 +46,6 @@ for file_name in os.listdir(data_path):
             print(jam.search(namespace='note_midi'))
             string_annotations = get_string_notes(jam.annotations['note_midi'][0], string_midi)
         
+        print(string_annotations)
         # Save the tab for the song
-        save_tab(file_name.split('.')[0], annotations)
+        save_tab(file_name.split('.')[0], string_annotations)
