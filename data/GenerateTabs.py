@@ -3,7 +3,7 @@ import numpy as np
 import librosa
 import jams
 
-data_path = "GuitarSet/audio/audio_mic"
+data_path = "GuitarSet/annotation"
 save_path = "ground_truth_tabs"
 if not os.path.exists(save_path):
     os.makedirs(save_path)
