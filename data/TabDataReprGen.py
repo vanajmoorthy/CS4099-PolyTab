@@ -99,12 +99,11 @@ class TabDataReprGen:
         print(f"Processed: {filename}, {len(labels)} frames")
 
 
-def main(n, mode):
-    gen = TabDataReprGen(mode)
+def main(n):
+    gen = TabDataReprGen()
     gen.process_file(n)
 
 
 if __name__ == "__main__":
     n = int(sys.argv[1])
-    mode = sys.argv[2] if len(sys.argv) > 2 else "c"
-    main(n, mode)
+    main(n)
