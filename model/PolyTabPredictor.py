@@ -178,4 +178,5 @@ if __name__ == '__main__':
     # Initialize and use your predictor
     predictor = PolyTabPredictor(model_weights_path)
     tabs = predictor.predict(audio_file, output_dir=output_dir)
-    predictor.create_guitar_tab_image(tabs, output_dir=audio_file[:-4])
+    tab_output_dir = output_dir + audio_file[:-4]
+    predictor.create_guitar_tab_image(tabs, output_dir=tab_output_dir)
