@@ -120,7 +120,7 @@ class PolyTabPredictor:
             os.makedirs(output_dir)
         
         total_frames = len(tabs)
-        frames_per_line = 24  # Adjust based on how many frames you want per line of tab
+        frames_per_line = 6  # Adjust based on how many frames you want per line of tab
         total_lines = total_frames // frames_per_line + (1 if total_frames % frames_per_line > 0 else 0)
         image_count = total_lines // lines_per_image + (1 if total_lines % lines_per_image > 0 else 0)
         
