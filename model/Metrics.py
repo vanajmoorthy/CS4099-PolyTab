@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def tab2pitch(tab):
+def convertTabToPitchVector(tab):
     """
     Converts a guitar tablature representation to a pitch vector representation.
 
@@ -28,7 +28,7 @@ def tab2pitch(tab):
     return pitch_vector
 
 
-def tab2bin(tab):
+def convertTabToBinary(tab):
     """
     Converts a guitar tablature representation to a binary representation.
 
@@ -65,8 +65,8 @@ def pitch_precision(pred, gt):
     Returns:
         float: The precision of the pitch class predictions.
     """
-    pitch_pred = np.array([tab2pitch(p) for p in pred])
-    pitch_gt = np.array([tab2pitch(gt) for gt in gt])
+    pitch_pred = np.array([convertTabToPitchVector(p) for p in pred])
+    pitch_gt = np.array([convertTabToPitchVector(gt) for gt in gt])
 
     numerator = np.sum(np.multiply(pitch_pred, pitch_gt).flatten())
     denominator = np.sum(pitch_pred.flatten())
@@ -85,8 +85,8 @@ def pitch_recall(pred, gt):
     Returns:
         float: The recall of the pitch class predictions.
     """
-    pitch_pred = np.array([tab2pitch(p) for p in pred])
-    pitch_gt = np.array([tab2pitch(gt) for gt in gt])
+    pitch_pred = np.array([convertTabToPitchVector(p) for p in pred])
+    pitch_gt = np.array([convertTabToPitchVector(gt) for gt in gt])
 
     numerator = np.sum(np.multiply(pitch_pred, pitch_gt).flatten())
     denominator = np.sum(pitch_gt.flatten())
@@ -122,8 +122,8 @@ def tab_precision(pred, gt):
     Returns:
         float: The precision of the binary tablature predictions.
     """
-    tab_pred = np.array([tab2bin(p) for p in pred])
-    tab_gt = np.array([tab2bin(gt) for gt in gt])
+    tab_pred = np.array([convertTabToBinary(p) for p in pred])
+    tab_gt = np.array([convertTabToBinary(gt) for gt in gt])
 
     numerator = np.sum(np.multiply(tab_pred, tab_gt).flatten())
     denominator = np.sum(tab_pred.flatten())
@@ -142,8 +142,8 @@ def tab_recall(pred, gt):
     Returns:
         float: The recall of the binary tablature predictions.
     """
-    tab_pred = np.array([tab2bin(p) for p in pred])
-    tab_gt = np.array([tab2bin(gt) for gt in gt])
+    tab_pred = np.array([convertTabToBinary(p) for p in pred])
+    tab_gt = np.array([convertTabToBinary(gt) for gt in gt])
 
     numerator = np.sum(np.multiply(tab_pred, tab_gt).flatten())
     denominator = np.sum(tab_gt.flatten())
