@@ -4,7 +4,8 @@ from keras.utils import Sequence
 
 
 class DataGenerator(Sequence):
-
+    # Sets up the generator with the dataset IDs, path to data, batch size, whether to shuffle, 
+    # the dimensions of the input data (X_dim), and labels (y_dim).
     def __init__(self, list_IDs, data_path="../data/cqt/", batch_size=128, shuffle=True, label_dim=(6, 21), spec_repr="c", con_win_size=9):
         self.list_IDs = list_IDs
         self.data_path = data_path
@@ -18,9 +19,12 @@ class DataGenerator(Sequence):
         self.y_dim = (self.batch_size, self.label_dim[0], self.label_dim[1])
         self.on_epoch_end()
 
+    # Returns the number of batches per epoch by dividing the total number of data 
+    # points by the batch size.
     def __len__(self):
         return int(np.floor(float(len(self.list_IDs)) / self.batch_size))
 
+    # Retrieves a batch at the specified index, with the data (X) and labels (y) for that batch.
     def __getitem__(self, index):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
@@ -30,11 +34,16 @@ class DataGenerator(Sequence):
 
         return X, y
 
+    # Shuffles the order of the dataset IDs at the end of each epoch if shuffling is enabled, to 
+    # ensure that the model does not see the data in the same order after each epoch.
     def on_epoch_end(self):
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
+    # Generates a batch of data by loading the specified files, padding the data to maintain 
+    # consistency in input shape, and returning the inputs and labels for the batch. It handles 
+    # data loading and preprocessing steps like padding and reshaping to get it ready for the model.
     def __data_generation(self, list_IDs_temp):
         X = np.empty(self.X_dim)
         y = np.empty(self.y_dim)
