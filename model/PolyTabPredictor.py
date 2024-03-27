@@ -114,7 +114,7 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
-    def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=100):
+    def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=20):
         """Generate images of guitar tabs, splitting into multiple images if necessary."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
