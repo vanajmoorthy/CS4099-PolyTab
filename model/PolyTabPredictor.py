@@ -115,30 +115,36 @@ class PolyTabPredictor:
         return tabs
     
     def create_guitar_tab_image(self, tabs, output_dir):
-        """Generate images of guitar tabs from the predictions."""
+        """Generate a single image of guitar tabs from the predictions."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
+        # Set the figure size based on the number of tabs. Adjust as needed.
+        fig_height = len(tabs) * 0.5  # 0.5 inches per tab line, adjust size as needed
+        fig, ax = plt.subplots(figsize=(10, fig_height))
+        
+        ax.set_xlim(0, 10)
+        ax.set_ylim(0, len(tabs))
+        
+        # Invert the y-axis to have the first frame at the top
+        ax.invert_yaxis()
+        
         for frame_index, tab_frame in enumerate(tabs):
-            fig, ax = plt.subplots(figsize=(10, 3))
-            ax.set_xlim(0, 10)
-            ax.set_ylim(0, 6)
-
-            # Draw strings
+            # Draw strings for each frame
             for i in range(6):
-                ax.axhline(i, color='black', linewidth=2)
-
+                ax.axhline(frame_index + (i * 0.1), color='black', linewidth=2)  # Adjust spacing as needed
+            
             # Add fret numbers
             for string_index, fret in enumerate(tab_frame):
                 if fret not in ['x', '-']:  # Check if fret is a number or 'x'
-                    ax.text(5, 5-string_index, fret, ha='center', va='center', fontsize=12, family='monospace')
-
-            ax.axis('off')
-            plt.box(False)
-            
-            output_path = os.path.join(output_dir, f"frame_{frame_index:03d}.png")
-            plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
-            plt.close()
+                    ax.text(5, frame_index + (5 - string_index) * 0.1, fret, ha='center', va='center', fontsize=8, family='monospace')  # Adjust text size and position as needed
+        
+        ax.axis('off')
+        plt.box(False)
+        
+        output_path = os.path.join(output_dir, "full_tab.png")
+        plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
+        plt.close()
 
     def predict_and_generate_images(self, audio_file, output_dir):
         tabs = self.predict(audio_file, output_dir=output_dir)
@@ -163,5 +169,5 @@ if __name__ == '__main__':
 
     # Initialize and use your predictor
     predictor = PolyTabPredictor(model_weights_path)
-    predictions = predictor.predict(audio_file, output_dir=output_dir)
+    # predictions = predictor.predict(audio_file, output_dir=output_dir)
     predictor.predict_and_generate_images(audio_file, output_dir=output_dir)
