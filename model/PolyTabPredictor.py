@@ -96,16 +96,16 @@ class PolyTabPredictor:
     def predictions_to_tabs(self, predictions):
         tabs = []
         for frame in predictions:
-            tab_frame = []
-            for string_predictions in frame:
+            tab_frame = ['-'] * self.num_strings  # Initialize with '-' for no play
+            for string_index, string_predictions in enumerate(frame):
                 # Get the fret with the highest probability
-                fret = np.argmax(string_predictions) - 1
-                # Convert fret number to string representation if necessary
-                print(f"Frame {frame}, fret {fret}")
-                # Convert to string for easy file writing
-                tab_frame.append(str(fret))
+                fret = np.argmax(string_predictions)
+                # Check if the fret is the open string played
+                if string_predictions[fret] > some_threshold:  # You need to define some_threshold
+                    tab_frame[string_index] = '0' if fret == 0 else str(fret - 1)
             tabs.append(tab_frame)
         return tabs
+
 
 
 if __name__ == '__main__':
