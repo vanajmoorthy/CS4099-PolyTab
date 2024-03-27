@@ -93,7 +93,7 @@ class PolyTabPredictor:
         return tabs
 
 
-    def predictions_to_tabs(self, predictions, threshold=0.5):
+    def predictions_to_tabs(self, predictions, threshold=0.7):
         """Convert model predictions to guitar tab format.
 
         Args:
