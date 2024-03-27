@@ -114,13 +114,13 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
-    def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=20):
+    def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=5):
         """Generate images of guitar tabs, splitting into multiple images if necessary."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         
         total_frames = len(tabs)
-        frames_per_line = 6  # Adjust based on how many frames you want per line of tab
+        frames_per_line = 24  # Adjust based on how many frames you want per line of tab
         total_lines = total_frames // frames_per_line + (1 if total_frames % frames_per_line > 0 else 0)
         image_count = total_lines // lines_per_image + (1 if total_lines % lines_per_image > 0 else 0)
         
