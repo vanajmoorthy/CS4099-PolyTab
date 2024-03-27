@@ -93,16 +93,24 @@ class PolyTabPredictor:
         return tabs
 
 
-    def predictions_to_tabs(self, predictions):
+    def predictions_to_tabs(self, predictions, threshold=0.5):
+        """Convert model predictions to guitar tab format.
+
+        Args:
+            predictions: Raw predictions from the model.
+            threshold: Probability threshold to consider a prediction as valid.
+
+        Returns:
+            A list of guitar tab frames.
+        """
         tabs = []
         for frame in predictions:
-            tab_frame = ['-'] * self.num_strings  # Initialize with '-' for no play
+            tab_frame = ['-'] * self.num_strings  # Default to no play
             for string_index, string_predictions in enumerate(frame):
-                # Get the fret with the highest probability
-                fret = np.argmax(string_predictions)
-                # Check if the fret is the open string played
-                if string_predictions[fret] > some_threshold:  # You need to define some_threshold
-                    tab_frame[string_index] = '0' if fret == 0 else str(fret - 1)
+                max_prob = np.max(string_predictions)
+                if max_prob > threshold:
+                    fret = np.argmax(string_predictions)
+                    tab_frame[string_index] = str(fret - 1) if fret > 0 else '0'  # '0' for open string, otherwise fret number
             tabs.append(tab_frame)
         return tabs
 
