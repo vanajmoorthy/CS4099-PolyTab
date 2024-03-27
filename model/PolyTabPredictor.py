@@ -93,7 +93,7 @@ class PolyTabPredictor:
         return tabs
 
 
-    def predictions_to_tabs(self, predictions, threshold=0.7):
+    def predictions_to_tabs(self, predictions, threshold=0.45):
         """Convert model predictions to guitar tab format.
 
         Args:
@@ -110,7 +110,7 @@ class PolyTabPredictor:
                 max_prob = np.max(string_predictions)
                 if max_prob > threshold:
                     fret = np.argmax(string_predictions)
-                    tab_frame[string_index] = str(fret - 1) if fret > 0 else '0'  # '0' for open string, otherwise fret number
+                    tab_frame[string_index] = str(fret - 1) if fret > 0 else 'x'  # '0' for open string, otherwise fret number
             tabs.append(tab_frame)
         return tabs
 
