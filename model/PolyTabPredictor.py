@@ -99,7 +99,7 @@ class PolyTabPredictor:
             tab_frame = []
             for string_predictions in frame:
                 # Get the fret with the highest probability
-                fret = np.argmax(string_predictions) + 1
+                fret = np.argmax(string_predictions) - 1
                 # Convert fret number to string representation if necessary
                 print(f"Frame {frame}, fret {fret}")
                 # Convert to string for easy file writing
