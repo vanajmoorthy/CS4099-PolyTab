@@ -114,42 +114,50 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
-    def create_guitar_tab_image(self, tabs, output_dir):
-        """Generate a single image of guitar tabs from the predictions."""
+    def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=100):
+        """Generate images of guitar tabs, splitting into multiple images if necessary."""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
+        
+        total_frames = len(tabs)
+        frames_per_line = 6  # Adjust based on how many frames you want per line of tab
+        total_lines = total_frames // frames_per_line + (1 if total_frames % frames_per_line > 0 else 0)
+        image_count = total_lines // lines_per_image + (1 if total_lines % lines_per_image > 0 else 0)
+        
+        for image_index in range(image_count):
+            start_line = image_index * lines_per_image
+            end_line = min((image_index + 1) * lines_per_image, total_lines)
             
-        # Set the figure size based on the number of tabs. Adjust as needed.
-        fig_height = len(tabs) * 0.5  # 0.5 inches per tab line, adjust size as needed
-        fig, ax = plt.subplots(figsize=(10, fig_height))
-        
-        ax.set_xlim(0, 10)
-        ax.set_ylim(0, len(tabs))
-        
-        # Invert the y-axis to have the first frame at the top
-        ax.invert_yaxis()
-        
-        for frame_index, tab_frame in enumerate(tabs):
-            # Draw strings for each frame
-            for i in range(6):
-                ax.axhline(frame_index + (i * 0.1), color='black', linewidth=2)  # Adjust spacing as needed
+            # Set the figure size based on the number of lines in this image
+            fig_height = end_line - start_line
+            fig, ax = plt.subplots(figsize=(10, fig_height))
+            ax.set_xlim(0, 10)
+            ax.set_ylim(0, end_line - start_line)
             
-            # Add fret numbers
-            for string_index, fret in enumerate(tab_frame):
-                if fret not in ['x', '-']:  # Check if fret is a number or 'x'
-                    ax.text(5, frame_index + (5 - string_index) * 0.1, fret, ha='center', va='center', fontsize=8, family='monospace')  # Adjust text size and position as needed
-        
-        ax.axis('off')
-        plt.box(False)
-        
-        output_path = os.path.join(output_dir, "full_tab.png")
-        plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
-        plt.close()
-
-    def predict_and_generate_images(self, audio_file, output_dir):
-        tabs = self.predict(audio_file, output_dir=output_dir)
-        self.create_guitar_tab_image(tabs, output_dir=output_dir)
-
+            ax.invert_yaxis()  # Invert the y-axis to have the first frame at the top
+            
+            for line_index in range(start_line, end_line):
+                for frame_offset in range(frames_per_line):
+                    frame_index = line_index * frames_per_line + frame_offset
+                    if frame_index >= total_frames:
+                        break
+                    tab_frame = tabs[frame_index]
+                    
+                    # Draw strings for this frame
+                    for string_index in range(6):
+                        y_position = line_index - start_line + (string_index * 0.1)  # Adjust spacing as needed
+                        ax.axhline(y_position, color='black', linewidth=2)
+                        
+                        fret = tab_frame[string_index]
+                        if fret not in ['x', '-']:  # Check if fret is a number or 'x'
+                            ax.text(5 + frame_offset, y_position, fret, ha='center', va='center', fontsize=8, family='monospace')  # Adjust text size and position as needed
+            
+            ax.axis('off')
+            plt.box(False)
+            
+            output_path = os.path.join(output_dir, f"tab_{image_index + 1:03d}.png")
+            plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
+            plt.close()
 
 
 if __name__ == '__main__':
@@ -169,5 +177,5 @@ if __name__ == '__main__':
 
     # Initialize and use your predictor
     predictor = PolyTabPredictor(model_weights_path)
-    # predictions = predictor.predict(audio_file, output_dir=output_dir)
-    predictor.predict_and_generate_images(audio_file, output_dir=output_dir)
+    tabs = predictor.predict(audio_file, output_dir=output_dir)
+    predictor.create_guitar_tab_image(tabs, output_dir=output_dir)
