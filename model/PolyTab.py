@@ -200,13 +200,13 @@ class PolyTab:
         #               metrics=[self.avg_acc],
         #               loss=loss_layer.call)
 
-        model.compile(loss=self.catcross_by_string,
-                      optimizer=tf.keras.optimizers.Adadelta(),
-                      metrics=[self.avg_acc])
+        # model.compile(loss=self.catcross_by_string,
+        #               optimizer=tf.keras.optimizers.Adadelta(),
+        #               metrics=[self.avg_acc])
 
-        # model.compile(optimizer=tf.keras.optimizers.AdamW(learning_rate=0.01, weight_decay=1e-4),
-        #               metrics=[self.avg_acc],
-        #               loss=loss_layer.call)
+        model.compile(optimizer=tf.keras.optimizers.AdamW(learning_rate=0.01, weight_decay=1e-4),
+                      metrics=[self.avg_acc],
+                      loss=loss_layer.call)
 
         self.model = model
 
@@ -220,14 +220,13 @@ class PolyTab:
         model_checkpoint_callback = ModelCheckpoint(
             filepath=checkpoint_filepath,
             save_weights_only=True,
-            # You might want to change this to 'loss' if you don't have a validation set.
             monitor='loss',
             mode='min',
             save_best_only=True)
 
         self.model.fit(
             self.training_generator,
-            validation_data=None,  # Or your validation data
+            validation_data=None, 
             epochs=self.epochs,
             verbose=1,
             callbacks=[model_checkpoint_callback, tensorboard_callback],
@@ -267,9 +266,6 @@ class PolyTab:
         df.to_csv(self.save_folder + "results.csv")
 
 
-##################################
-########### EXPERIMENT ###########
-##################################
 if __name__ == '__main__':
     polytab = PolyTab()
 
