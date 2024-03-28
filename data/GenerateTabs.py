@@ -2,7 +2,7 @@ import os
 import numpy as np
 import jams
 
-class GuitarTabsFromLabels:
+class GenerateTabs:
     def __init__(self, data_path="./GuitarSet/", output_dir="./ground_truth_tabs/"):
         self.anno_path = os.path.join(data_path, "annotation/")
         self.output_dir = output_dir
@@ -78,5 +78,5 @@ class GuitarTabsFromLabels:
             print(f"Generated tabs for {filename}")
 
 if __name__ == "__main__":
-    tab_generator = GuitarTabsFromLabels()
+    tab_generator = GenerateTabs()
     tab_generator.generate_tabs_for_all_files()
