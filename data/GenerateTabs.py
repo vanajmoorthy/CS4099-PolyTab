@@ -33,13 +33,25 @@ class GuitarTabsFromLabels:
         jam = jams.load(anno_file)
         labels = []
 
+        # Iterate over each string's annotations
         for string_num in range(6):
             anno = jam.annotations["note_midi"][string_num]
-            string_labels = [-1 if not notes else int(round(notes[0]['value']) - self.string_midi_pitches[string_num]) for notes in anno.data]
+            string_labels = []
+
+            # Process each note in the annotations for the current string
+            for note in anno.data:
+                if note.value:  # Check if there is a note value
+                    pitch = note.value  # Directly use the note value (which is a float)
+                    fret = int(round(pitch)) - self.string_midi_pitches[string_num]
+                    string_labels.append(max(min(fret, self.highest_fret), -1))  # Ensure fret number is within valid range
+                else:
+                    string_labels.append(-1)  # Indicate no play with -1
+
             labels.append(string_labels)
         
-        labels = np.array(labels).T
+        labels = np.array(labels).T  # Correct the orientation of labels
         return labels
+
 
     def generate_tabs_from_labels(self, filename):
         """
