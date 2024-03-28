@@ -114,6 +114,36 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
+    def aggregate_predictions(self, tabs, aggregation_window=43):
+        """
+        Aggregate predictions over a specified window to reduce granularity.
+        This method assumes tabs to be a list of lists where each sublist represents
+        a frame's prediction across all strings.
+        
+        Args:
+            tabs (list): The list of per-frame predictions.
+            aggregation_window (int): Number of frames to aggregate over.
+            
+        Returns:
+            list: Aggregated tab predictions.
+        """
+        aggregated_tabs = []
+        for i in range(0, len(tabs), aggregation_window):
+            window = tabs[i:i+aggregation_window]
+            # Aggregate predictions by taking the most common prediction in the window for each string
+            aggregated_frame = []
+            for string_idx in range(6):  # Assuming 6 strings
+                # Extract predictions for the current string across the window
+                string_predictions = [frame[string_idx] for frame in window if frame[string_idx] != 'x']
+                if string_predictions:
+                    # Find the most common prediction, default to 'x' if no prediction is present
+                    most_common = max(set(string_predictions), key=string_predictions.count)
+                else:
+                    most_common = 'x'
+                aggregated_frame.append(most_common)
+            aggregated_tabs.append(aggregated_frame)
+        return aggregated_tabs
+    
     def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=5):
         """Generate images of guitar tabs, splitting into multiple images if necessary."""
         if not os.path.exists(output_dir):
@@ -178,5 +208,6 @@ if __name__ == '__main__':
     # Initialize and use your predictor
     predictor = PolyTabPredictor(model_weights_path)
     tabs = predictor.predict(audio_file, output_dir=output_dir)
+    aggregated_tabs = predictor.aggregate_predictions(tabs, aggregation_window=43)
     tab_output_dir = output_dir + audio_file[:-4]
-    predictor.create_guitar_tab_image(tabs, output_dir=tab_output_dir)
+    predictor.create_guitar_tab_image(aggregated_tabs, output_dir=tab_output_dir)
