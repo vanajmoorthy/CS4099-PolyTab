@@ -10,7 +10,6 @@ class GenerateTabs:
             os.makedirs(self.output_dir)
         self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
         self.highest_fret = 19
-        self.frame_rate = 43
 
     def convert_labels_to_tabs(self, labels):
         """
@@ -30,75 +29,37 @@ class GenerateTabs:
     def load_and_process_labels(self, filename):
         """
         Loads labels from a .jams file and processes them into a human-readable tab format.
-        Adjusted to handle overlapping notes by considering only the first note encountered per string.
         """
-        anno_file = os.path.join(self.anno_path, filename)
+        anno_file = os.path.join(self.anno_path, f"{filename}")
         jam = jams.load(anno_file)
+        labels = []
 
-        # Initialize a list for each string's labels with the max possible length based on the jam's duration and frame rate
-        duration = jam.file_metadata.duration
-        max_len = int(np.ceil(duration * self.frame_rate))
-
-        labels = np.full((6, max_len), -1)  # Initialize with -1 for no play
-
+        # Iterate over each string's annotations
         for string_num in range(6):
-            anno = jam.search(namespace='note_midi')[string_num]
+            anno = jam.annotations["note_midi"][string_num]
+            string_labels = []
+
+            # Process each note in the annotations for the current string
             for note in anno.data:
-                start_time = note.time
-                end_time = note.time + note.duration
-                start_frame = int(np.floor(start_time * self.frame_rate))
-                end_frame = int(np.ceil(end_time * self.frame_rate))
-                pitch = note.value
-                fret_number = int(round(pitch)) - self.string_midi_pitches[string_num]
-                fret_number = max(min(fret_number, self.highest_fret), 0)  # Ensure fret number is within valid range
-
-                # Fill the frames corresponding to the note duration with the fret number, considering only the first note
-                for frame in range(start_frame, min(end_frame, max_len)):
-                    if labels[string_num, frame] == -1:  # Fill only if no note has been registered yet
-                        labels[string_num, frame] = fret_number
-
-        # Convert the labels matrix into the expected list format for tab conversion
-        labels_list = labels.T.tolist()  # Transpose and convert to list for compatibility
-        return labels_list
-
-    
-    def aggregate_annotations(self, annotations):
-        """
-        Aggregates annotations over a specified window to perform temporal smoothing.
-        """
-        # Calculate the total frames based on the maximum duration across all strings
-        max_len = max(len(string_ann) for string_ann in annotations)
-
-        # Assuming annotations have been correctly aligned and padded before this method
-        # Initialize aggregated annotations list
-        aggregated_annotations = []
-
-        # Perform aggregation over each time window for all strings
-        for frame in range(0, max_len, self.frame_rate):
-            window = [string_ann[frame:frame + self.frame_rate] for string_ann in annotations]
-            aggregated_frame = []
-            
-            for string_ann in window:
-                # Exclude '-1' indicating no play, then find the most common fret if any
-                frets = [fret for fret in string_ann if fret != -1]
-                if frets:
-                    most_common_fret = max(set(frets), key=frets.count)
+                if note.value:  # Check if there is a note value
+                    pitch = note.value  # Directly use the note value (which is a float)
+                    fret = int(round(pitch)) - self.string_midi_pitches[string_num]
+                    string_labels.append(max(min(fret, self.highest_fret), -1))  # Ensure fret number is within valid range
                 else:
-                    most_common_fret = -1  # No play for the entire window
-                aggregated_frame.append(most_common_fret)
-                
-            aggregated_annotations.append(aggregated_frame)
+                    string_labels.append(-1)  # Indicate no play with -1
 
-        return aggregated_annotations
+            labels.append(string_labels)
+        
+        labels = np.array(labels).T  # Correct the orientation of labels
+        return labels
 
 
     def generate_tabs_from_labels(self, filename):
         """
-        Generates text files for guitar tabs from labels, including temporal smoothing.
+        Generates text files for guitar tabs from labels.
         """
-        annotations = self.load_and_process_labels(filename)
-        smoothed_annotations = self.aggregate_annotations(annotations)
-        tab_strings = self.convert_labels_to_tabs(smoothed_annotations)
+        labels = self.load_and_process_labels(filename)
+        tab_strings = self.convert_labels_to_tabs(labels)
 
         output_file_path = os.path.join(self.output_dir, f"{os.path.splitext(filename)[0]}_tabs.txt")
         with open(output_file_path, 'w') as f:
