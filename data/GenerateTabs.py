@@ -29,29 +29,35 @@ class GenerateTabs:
     def load_and_process_labels(self, filename):
         """
         Loads labels from a .jams file and processes them into a human-readable tab format.
+        Ensures that all lists have the same length before converting to a NumPy array.
         """
         anno_file = os.path.join(self.anno_path, f"{filename}")
         jam = jams.load(anno_file)
         labels = []
 
-        # Iterate over each string's annotations
+        # Determine the maximum length among all strings' annotations
+        max_length = 0
+        for string_num in range(6):
+            anno = jam.annotations["note_midi"][string_num]
+            max_length = max(max_length, len(anno.data))
+
+        # Process annotations, ensuring all lists are the same length
         for string_num in range(6):
             anno = jam.annotations["note_midi"][string_num]
             string_labels = []
-
-            # Process each note in the annotations for the current string
             for note in anno.data:
-                if note.value:  # Check if there is a note value
-                    pitch = note.value  # Directly use the note value (which is a float)
-                    fret = int(round(pitch)) - self.string_midi_pitches[string_num]
-                    string_labels.append(max(min(fret, self.highest_fret), -1))  # Ensure fret number is within valid range
-                else:
-                    string_labels.append(-1)  # Indicate no play with -1
+                pitch = note.value if note.value else -1  # Directly use the note value
+                fret = int(round(pitch)) - self.string_midi_pitches[string_num] if pitch != -1 else -1
+                fret = max(min(fret, self.highest_fret), -1)  # Ensure fret number is within valid range
+                string_labels.append(fret)
 
+            # Pad the list to ensure it's the same length as the longest list
+            string_labels += [-1] * (max_length - len(string_labels))
             labels.append(string_labels)
-        
-        labels = np.array(labels).T  # Correct the orientation of labels
+
+        labels = np.array(labels).T  # Now safe to transpose
         return labels
+
 
 
     def generate_tabs_from_labels(self, filename):
