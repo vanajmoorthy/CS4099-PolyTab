@@ -29,29 +29,36 @@ class GenerateTabs:
     def load_and_process_labels(self, filename):
         """
         Loads labels from a .jams file and processes them into a human-readable tab format.
+        Correctly handles the .jams file structure to access MIDI pitch values.
         """
-        anno_file = os.path.join(self.anno_path, f"{filename}")
+        anno_file = os.path.join(self.anno_path, filename)
         jam = jams.load(anno_file)
-        labels = []
-
-        # Iterate over each string's annotations
-        for string_num in range(6):
-            anno = jam.annotations["note_midi"][string_num]
-            string_labels = []
-
-            # Process each note in the annotations for the current string
-            for note in anno.data:
-                if note.value:  # Check if there is a note value
-                    pitch = note.value  # Directly use the note value (which is a float)
-                    fret = int(round(pitch)) - self.string_midi_pitches[string_num]
-                    string_labels.append(max(min(fret, self.highest_fret), -1))  # Ensure fret number is within valid range
-                else:
-                    string_labels.append(-1)  # Indicate no play with -1
-
-            labels.append(string_labels)
         
+        # Initialize a list for each string's labels
+        labels = [[] for _ in range(6)]
+
+        # Iterate through all annotations, filter for note_midi type
+        for anno in jam.annotations:
+            if anno.namespace != 'note_midi':
+                continue  # Skip annotations that are not MIDI notes
+
+            # Determine which string this annotation belongs to
+            string_num = int(anno.annotation_metadata.instrument[0].split()[1]) - 1  # Assuming the instrument naming follows "String X"
+            for note in anno.data:
+                pitch = note.value
+                # Convert MIDI pitch to fret number, considering the open string's MIDI pitch
+                fret_number = int(round(pitch - self.string_midi_pitches[string_num]))
+                # Clamp the fret number to the range [0, highest_fret]
+                labels[string_num].append(max(min(fret_number, self.highest_fret), 0))
+
+        # Normalize label lengths by padding with -1
+        max_len = max(len(l) for l in labels)
+        for l in labels:
+            l.extend([-1] * (max_len - len(l)))  # Pad with -1 for no play
+
         labels = np.array(labels).T  # Correct the orientation of labels
         return labels
+
 
 
     def generate_tabs_from_labels(self, filename):
