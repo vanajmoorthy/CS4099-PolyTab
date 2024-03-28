@@ -9,6 +9,7 @@ class GuitarTabsFromLabels:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
         self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
+        self.highest_fret = 19
 
     def convert_labels_to_tabs(self, labels):
         """
