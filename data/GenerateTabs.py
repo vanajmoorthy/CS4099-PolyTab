@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import jams
+from scipy.stats import mode
 
 class GenerateTabs:
     def __init__(self, data_path="./GuitarSet/", output_dir="./ground_truth_tabs/"):
@@ -62,15 +63,29 @@ class GenerateTabs:
         return labels_list
 
 
-
-
+    def temporal_smoothing(self, labels, window_size=43):
+        """
+        Applies temporal smoothing to labels over a specified window size.
+        """
+        smoothed_labels = []
+        for frame_idx in range(len(labels)):
+            window_start = max(0, frame_idx - window_size // 2)
+            window_end = min(len(labels), frame_idx + window_size // 2 + 1)
+            window_labels = labels[window_start:window_end]
+            
+            # Find the mode (most common element) in the window for each string
+            mode_labels = mode(window_labels, axis=0).mode[0]
+            smoothed_labels.append(mode_labels)
+        
+        return np.array(smoothed_labels)
 
     def generate_tabs_from_labels(self, filename):
         """
-        Generates text files for guitar tabs from labels.
+        Generates text files for guitar tabs from labels with temporal smoothing applied.
         """
         labels = self.load_and_process_labels(filename)
-        tab_strings = self.convert_labels_to_tabs(labels)
+        smoothed_labels = self.temporal_smoothing(labels)  # Apply temporal smoothing
+        tab_strings = self.convert_labels_to_tabs(smoothed_labels)
 
         output_file_path = os.path.join(self.output_dir, f"{os.path.splitext(filename)[0]}_tabs.txt")
         with open(output_file_path, 'w') as f:
