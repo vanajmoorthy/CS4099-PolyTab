@@ -70,28 +70,7 @@ class PolyTabPredictor:
             predictions.append(prediction[0])
 
         # Convert predictions to guitar tabs format
-        tabs = self.predictions_to_tabs(predictions)
-
-        if output_dir:
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-            audio_filename = os.path.basename(audio_file)
-            raw_predictions_file = os.path.join(output_dir, f"{os.path.splitext(audio_filename)[0]}_raw_predictions.txt")
-            tabs_file = os.path.join(output_dir, f"{os.path.splitext(audio_filename)[0]}_tabs.txt")
-
-            # Save raw predictions
-            with open(raw_predictions_file, "w") as rp_file:
-                for frame_idx, raw_prediction in enumerate(predictions):
-                    formatted_prediction = np.array2string(raw_prediction, separator=', ', suppress_small=True)
-                    rp_file.write(f"Frame {frame_idx}: {formatted_prediction}\n")
-
-            # Save mapped predictions (tabs)
-            with open(tabs_file, "w") as tf_file:
-                for frame_idx, tab_frame in enumerate(tabs):
-                    tf_file.write(f"Frame {frame_idx}: {' '.join(map(str, tab_frame))}\n")
-
-        return tabs
-
+        return self.predictions_to_tabs(predictions)
 
     def predictions_to_tabs(self, predictions, threshold=0.1):
         """Convert model predictions to guitar tab format.
@@ -144,6 +123,40 @@ class PolyTabPredictor:
             aggregated_tabs.append(aggregated_frame)
         return aggregated_tabs
     
+    def save_aggregated_tabs_to_file(self, aggregated_tabs, filename):
+        """
+        Saves the aggregated tab predictions to a text file.
+        
+        Args:
+            aggregated_tabs (list): Aggregated tab predictions.
+            filename (str): Path to the output text file.
+        """
+        with open(filename, 'w') as file:
+            for tab in aggregated_tabs:
+                tab_line = ' '.join(tab)
+                file.write(f"{tab_line}\n")
+        print(f"Aggregated tabs saved to {filename}")
+    
+    def predict_save_aggregated(self, audio_file, output_dir=None, aggregation_window=43):
+        """
+        Predicts and aggregates tabs for an audio file and saves them to a text file.
+        """
+        tabs = self.predict(audio_file, output_dir)
+        aggregated_tabs = self.aggregate_predictions(tabs, aggregation_window)
+        
+        # Save aggregated tabs to a text file
+        if output_dir is not None:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            base_filename = os.path.splitext(os.path.basename(audio_file))[0]
+            aggregated_tabs_file = os.path.join(output_dir, f"{base_filename}_aggregated_tabs.txt")
+            self.save_aggregated_tabs_to_file(aggregated_tabs, aggregated_tabs_file)
+        else:
+            print("Output directory is not specified.")
+        
+        # For visualizing tabs as images, you can still use your existing method
+        # self.create_guitar_tab_image(aggregated_tabs, output_dir=tab_output_dir, lines_per_image=5)
+    
     def create_guitar_tab_image(self, tabs, output_dir, lines_per_image=5):
         """Generate images of guitar tabs, splitting into multiple images if necessary."""
         if not os.path.exists(output_dir):
@@ -192,22 +205,14 @@ class PolyTabPredictor:
 
 if __name__ == '__main__':
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Predict guitar tabs from audio file.')
+    parser = argparse.ArgumentParser(description='Predict and save guitar tabs from an audio file.')
     parser.add_argument('--weights', required=True, help='Path to the model weights file.')
     parser.add_argument('--audio', required=True, help='Path to the audio file.')
     args = parser.parse_args()
 
-    # Set numpy print options to suppress scientific notation and increase precision
-    np.set_printoptions(suppress=True, precision=8)
-
-    # Use the provided arguments
     model_weights_path = args.weights
     audio_file = args.audio
     output_dir = "predictions"
 
-    # Initialize and use your predictor
     predictor = PolyTabPredictor(model_weights_path)
-    tabs = predictor.predict(audio_file, output_dir=output_dir)
-    aggregated_tabs = predictor.aggregate_predictions(tabs, aggregation_window=43)
-    tab_output_dir = output_dir + audio_file[:-4]
-    predictor.create_guitar_tab_image(aggregated_tabs, output_dir=tab_output_dir)
+    predictor.predict_save_aggregated(audio_file, output_dir=output_dir, aggregation_window=43)
