@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import jams
-from scipy.stats import mode
 
 class GenerateTabs:
     def __init__(self, data_path="./GuitarSet/", output_dir="./ground_truth_tabs/"):
@@ -11,6 +10,7 @@ class GenerateTabs:
             os.makedirs(self.output_dir)
         self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
         self.highest_fret = 19
+        self.frame_rate = 43
 
     def convert_labels_to_tabs(self, labels):
         """
@@ -37,8 +37,7 @@ class GenerateTabs:
 
         # Initialize a list for each string's labels with the max possible length based on the jam's duration and frame rate
         duration = jam.file_metadata.duration
-        frame_rate = 43  # Assuming a frame rate of 43 frames per second as mentioned
-        max_len = int(np.ceil(duration * frame_rate))
+        max_len = int(np.ceil(duration * self.frame_rate))
 
         labels = np.full((6, max_len), -1)  # Initialize with -1 for no play
 
@@ -47,8 +46,8 @@ class GenerateTabs:
             for note in anno.data:
                 start_time = note.time
                 end_time = note.time + note.duration
-                start_frame = int(np.floor(start_time * frame_rate))
-                end_frame = int(np.ceil(end_time * frame_rate))
+                start_frame = int(np.floor(start_time * self.frame_rate))
+                end_frame = int(np.ceil(end_time * self.frame_rate))
                 pitch = note.value
                 fret_number = int(round(pitch)) - self.string_midi_pitches[string_num]
                 fret_number = max(min(fret_number, self.highest_fret), 0)  # Ensure fret number is within valid range
@@ -62,30 +61,39 @@ class GenerateTabs:
         labels_list = labels.T.tolist()  # Transpose and convert to list for compatibility
         return labels_list
 
-
-    def temporal_smoothing(self, labels, window_size=43):
+    
+    def aggregate_annotations(self, annotations):
         """
-        Applies temporal smoothing to labels over a specified window size.
+        Aggregates annotations over a specified window to perform temporal smoothing.
         """
-        smoothed_labels = []
-        for frame_idx in range(len(labels)):
-            window_start = max(0, frame_idx - window_size // 2)
-            window_end = min(len(labels), frame_idx + window_size // 2 + 1)
-            window_labels = labels[window_start:window_end]
-            
-            # Find the mode (most common element) in the window for each string
-            mode_labels = mode(window_labels, axis=0).mode[0]
-            smoothed_labels.append(mode_labels)
+        # Calculate the total frames based on the maximum duration across all strings
+        total_frames = max(len(ann) for ann in annotations)
         
-        return np.array(smoothed_labels)
+        # Initialize aggregated annotations with -1
+        aggregated_annotations = np.full((6, total_frames), -1, dtype=int)
+        
+        # Aggregate annotations for each string
+        for string_num, string_ann in enumerate(annotations):
+            for frame in range(0, total_frames, self.frame_rate):
+                frame_ann = string_ann[frame:frame + self.frame_rate]
+                if frame_ann:
+                    # Get the most common fret number in the current window, excluding -1 (no play)
+                    fret_numbers = [ann for ann in frame_ann if ann != -1]
+                    if fret_numbers:
+                        most_common_fret = max(set(fret_numbers), key=fret_numbers.count)
+                        aggregated_annotations[string_num, frame // self.frame_rate] = most_common_fret
+        
+        # Convert back to the list format for compatibility with the rest of the code
+        return aggregated_annotations.T.tolist()
+
 
     def generate_tabs_from_labels(self, filename):
         """
-        Generates text files for guitar tabs from labels with temporal smoothing applied.
+        Generates text files for guitar tabs from labels, including temporal smoothing.
         """
-        labels = self.load_and_process_labels(filename)
-        smoothed_labels = self.temporal_smoothing(labels)  # Apply temporal smoothing
-        tab_strings = self.convert_labels_to_tabs(smoothed_labels)
+        annotations = self.load_and_process_labels(filename)
+        smoothed_annotations = self.aggregate_annotations(annotations)
+        tab_strings = self.convert_labels_to_tabs(smoothed_annotations)
 
         output_file_path = os.path.join(self.output_dir, f"{os.path.splitext(filename)[0]}_tabs.txt")
         with open(output_file_path, 'w') as f:
