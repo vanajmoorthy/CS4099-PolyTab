@@ -29,29 +29,38 @@ class GenerateTabs:
     def load_and_process_labels(self, filename):
         """
         Loads labels from a .jams file and processes them into a human-readable tab format.
+        Adjusted to handle overlapping notes by considering only the first note encountered per string.
         """
         anno_file = os.path.join(self.anno_path, filename)
         jam = jams.load(anno_file)
-        
-        # Initialize a list for each string's labels
-        labels = [[] for _ in range(6)]
 
-        # Assuming annotations are ordered by strings (EADGBE), from lowest pitch to highest
-        for string_num, anno in enumerate(jam.search(namespace='note_midi')):
+        # Initialize a list for each string's labels with the max possible length based on the jam's duration and frame rate
+        duration = jam.file_metadata.duration
+        frame_rate = 43  # Assuming a frame rate of 43 frames per second as mentioned
+        max_len = int(np.ceil(duration * frame_rate))
+
+        labels = np.full((6, max_len), -1)  # Initialize with -1 for no play
+
+        for string_num in range(6):
+            anno = jam.search(namespace='note_midi')[string_num]
             for note in anno.data:
+                start_time = note.time
+                end_time = note.time + note.duration
+                start_frame = int(np.floor(start_time * frame_rate))
+                end_frame = int(np.ceil(end_time * frame_rate))
                 pitch = note.value
-                # Convert MIDI pitch to fret number, considering the open string's MIDI pitch
                 fret_number = int(round(pitch)) - self.string_midi_pitches[string_num]
-                # Ensure fret number is within valid range, considering -1 for unused strings in a particular frame
-                labels[string_num].append(max(min(fret_number, self.highest_fret), -1))
+                fret_number = max(min(fret_number, self.highest_fret), 0)  # Ensure fret number is within valid range
 
-        # Normalize label lengths by padding with -1
-        max_len = max(len(l) for l in labels)
-        for l in labels:
-            l.extend([-1] * (max_len - len(l)))  # Pad with -1 for no play
+                # Fill the frames corresponding to the note duration with the fret number, considering only the first note
+                for frame in range(start_frame, min(end_frame, max_len)):
+                    if labels[string_num, frame] == -1:  # Fill only if no note has been registered yet
+                        labels[string_num, frame] = fret_number
 
-        labels = np.array(labels).T  # Correct the orientation of labels
-        return labels
+        # Convert the labels matrix into the expected list format for tab conversion
+        labels_list = labels.T.tolist()  # Transpose and convert to list for compatibility
+        return labels_list
+
 
 
 
