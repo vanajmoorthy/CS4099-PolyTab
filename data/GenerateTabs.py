@@ -29,7 +29,6 @@ class GenerateTabs:
     def load_and_process_labels(self, filename):
         """
         Loads labels from a .jams file and processes them into a human-readable tab format.
-        Correctly handles the .jams file structure to access MIDI pitch values.
         """
         anno_file = os.path.join(self.anno_path, filename)
         jam = jams.load(anno_file)
@@ -37,19 +36,14 @@ class GenerateTabs:
         # Initialize a list for each string's labels
         labels = [[] for _ in range(6)]
 
-        # Iterate through all annotations, filter for note_midi type
-        for anno in jam.annotations:
-            if anno.namespace != 'note_midi':
-                continue  # Skip annotations that are not MIDI notes
-
-            # Determine which string this annotation belongs to
-            string_num = int(anno.annotation_metadata.instrument[0].split()[1]) - 1  # Assuming the instrument naming follows "String X"
+        # Assuming annotations are ordered by strings (EADGBE), from lowest pitch to highest
+        for string_num, anno in enumerate(jam.search(namespace='note_midi')):
             for note in anno.data:
                 pitch = note.value
                 # Convert MIDI pitch to fret number, considering the open string's MIDI pitch
-                fret_number = int(round(pitch - self.string_midi_pitches[string_num]))
-                # Clamp the fret number to the range [0, highest_fret]
-                labels[string_num].append(max(min(fret_number, self.highest_fret), 0))
+                fret_number = int(round(pitch)) - self.string_midi_pitches[string_num]
+                # Ensure fret number is within valid range, considering -1 for unused strings in a particular frame
+                labels[string_num].append(max(min(fret_number, self.highest_fret), -1))
 
         # Normalize label lengths by padding with -1
         max_len = max(len(l) for l in labels)
@@ -58,6 +52,7 @@ class GenerateTabs:
 
         labels = np.array(labels).T  # Correct the orientation of labels
         return labels
+
 
 
 
