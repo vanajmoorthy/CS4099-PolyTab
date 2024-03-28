@@ -67,24 +67,29 @@ class GenerateTabs:
         Aggregates annotations over a specified window to perform temporal smoothing.
         """
         # Calculate the total frames based on the maximum duration across all strings
-        total_frames = max(len(ann) for ann in annotations)
-        
-        # Initialize aggregated annotations with -1
-        aggregated_annotations = np.full((6, total_frames), -1, dtype=int)
-        
-        # Aggregate annotations for each string
-        for string_num, string_ann in enumerate(annotations):
-            for frame in range(0, total_frames, self.frame_rate):
-                frame_ann = string_ann[frame:frame + self.frame_rate]
-                if frame_ann:
-                    # Get the most common fret number in the current window, excluding -1 (no play)
-                    fret_numbers = [ann for ann in frame_ann if ann != -1]
-                    if fret_numbers:
-                        most_common_fret = max(set(fret_numbers), key=fret_numbers.count)
-                        aggregated_annotations[string_num, frame // self.frame_rate] = most_common_fret
-        
-        # Convert back to the list format for compatibility with the rest of the code
-        return aggregated_annotations.T.tolist()
+        max_len = max(len(string_ann) for string_ann in annotations)
+
+        # Assuming annotations have been correctly aligned and padded before this method
+        # Initialize aggregated annotations list
+        aggregated_annotations = []
+
+        # Perform aggregation over each time window for all strings
+        for frame in range(0, max_len, self.frame_rate):
+            window = [string_ann[frame:frame + self.frame_rate] for string_ann in annotations]
+            aggregated_frame = []
+            
+            for string_ann in window:
+                # Exclude '-1' indicating no play, then find the most common fret if any
+                frets = [fret for fret in string_ann if fret != -1]
+                if frets:
+                    most_common_fret = max(set(frets), key=frets.count)
+                else:
+                    most_common_fret = -1  # No play for the entire window
+                aggregated_frame.append(most_common_fret)
+                
+            aggregated_annotations.append(aggregated_frame)
+
+        return aggregated_annotations
 
 
     def generate_tabs_from_labels(self, filename):
