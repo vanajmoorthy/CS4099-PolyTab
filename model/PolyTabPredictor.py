@@ -143,7 +143,7 @@ class PolyTabPredictor:
         """
         tabs = self.predict(audio_file, output_dir)
         aggregated_tabs = self.aggregate_predictions(tabs, aggregation_window)
-        
+
         # Save aggregated tabs to a text file
         if output_dir is not None:
             if not os.path.exists(output_dir):
@@ -151,6 +151,9 @@ class PolyTabPredictor:
             base_filename = os.path.splitext(os.path.basename(audio_file))[0]
             aggregated_tabs_file = os.path.join(output_dir, f"{base_filename}_aggregated_tabs.txt")
             self.save_aggregated_tabs_to_file(aggregated_tabs, aggregated_tabs_file)
+            
+            # Generate and save images of aggregated tabs.
+            self.create_guitar_tab_image(aggregated_tabs, audio_file[:-4])
         else:
             print("Output directory is not specified.")
         
