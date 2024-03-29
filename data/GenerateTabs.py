@@ -8,81 +8,42 @@ class GenerateTabs:
         self.output_dir = output_dir
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-        self.string_midi_pitches = [40, 45, 50, 55, 59, 64]
-        self.highest_fret = 19
+        self.string_midi_pitches = [40, 45, 50, 55, 59, 64]  # MIDI numbers for open strings (EADGBE).
 
-    def convert_labels_to_tabs(self, labels):
-        """
-        Converts numeric labels into guitar tab strings.
-        """
-        tab_strings = []
-        for label in labels:
-            tab_string = ""
-            for string_label in label:
-                if string_label == -1:  # No play
-                    tab_string += "x "
-                else:
-                    tab_string += f"{string_label} "
-            tab_strings.append(tab_string.strip())
+    def midi_to_fret(self, midi_number, string_number):
+        """Converts a MIDI number to a fret number based on the open string's MIDI number."""
+        return midi_number - self.string_midi_pitches[string_number]
+
+    def generate_tab_for_jams(self, jams_file):
+        """Generates guitar tabs directly from jams file annotations."""
+        jam = jams.load(jams_file)
+        tab_strings = []  # Store the final tab strings for each time slice.
+
+        for string_num in range(6):  # For each guitar string.
+            anno = jam.search(namespace='note_midi')[string_num]
+            for note in anno.data:
+                start_time = note.time
+                end_time = note.time + note.duration
+                midi_number = note.value
+                fret_number = self.midi_to_fret(midi_number, string_num)
+                # Here, you can insert logic to handle overlapping notes if necessary.
+                tab_strings.append(f"{string_num+1}: Fret {fret_number}, Start: {start_time}s, End: {end_time}s")
+
         return tab_strings
 
-    def load_and_process_labels(self, filename):
-        """
-        Loads labels from a .jams file and processes them into a human-readable tab format.
-        Ensures that all lists have the same length before converting to a NumPy array.
-        """
-        anno_file = os.path.join(self.anno_path, f"{filename}")
-        jam = jams.load(anno_file)
-        labels = []
-
-        # Determine the maximum length among all strings' annotations
-        max_length = 0
-        for string_num in range(6):
-            anno = jam.annotations["note_midi"][string_num]
-            max_length = max(max_length, len(anno.data))
-
-        # Process annotations, ensuring all lists are the same length
-        for string_num in range(6):
-            anno = jam.annotations["note_midi"][string_num]
-            string_labels = []
-            for note in anno.data:
-                pitch = note.value if note.value else -1  # Directly use the note value
-                fret = int(round(pitch)) - self.string_midi_pitches[string_num] if pitch != -1 else -1
-                fret = max(min(fret, self.highest_fret), -1)  # Ensure fret number is within valid range
-                string_labels.append(fret)
-
-            # Pad the list to ensure it's the same length as the longest list
-            string_labels += [-1] * (max_length - len(string_labels))
-            labels.append(string_labels)
-
-        labels = np.array(labels).T  # Now safe to transpose
-        return labels
-
-
-
-    def generate_tabs_from_labels(self, filename):
-        """
-        Generates text files for guitar tabs from labels.
-        """
-        labels = self.load_and_process_labels(filename)
-        tab_strings = self.convert_labels_to_tabs(labels)
-
-        output_file_path = os.path.join(self.output_dir, f"{os.path.splitext(filename)[0]}_tabs.txt")
-        with open(output_file_path, 'w') as f:
-            for tab_string in tab_strings:
-                f.write(tab_string + "\n")
-
-        print(f"Guitar tabs for {filename} saved to {output_file_path}")
-
-    def generate_tabs_for_all_files(self):
-        """
-        Generates guitar tabs for all .jams files in the annotation directory.
-        """
-        jams_files = [f for f in os.listdir(self.anno_path) if f.endswith('.jams')]
-        for filename in jams_files:
-            self.generate_tabs_from_labels(filename)
-            print(f"Generated tabs for {filename}")
+    def generate_tabs_from_annotations(self):
+        """Processes all .jams files in the directory and generates tabs."""
+        for filename in os.listdir(self.anno_path):
+            if filename.endswith('.jams'):
+                jams_file = os.path.join(self.anno_path, filename)
+                tab_strings = self.generate_tab_for_jams(jams_file)
+                output_filename = filename.replace('.jams', '_tabs.txt')
+                output_file = os.path.join(self.output_dir, output_filename)
+                with open(output_file, 'w') as f:
+                    for tab_string in tab_strings:
+                        f.write(tab_string + "\n")
+                print(f"Tabs for {filename} have been saved to {output_file}")
 
 if __name__ == "__main__":
-    tab_generator = GenerateTabs()
-    tab_generator.generate_tabs_for_all_files()
+    tab_generator = GenerateTabs(data_path="./GuitarSet/", output_dir="./ground_truth_tabs/")
+    tab_generator.generate_tabs_from_annotations()
