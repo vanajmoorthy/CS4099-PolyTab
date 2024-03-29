@@ -68,6 +68,13 @@ class PolyTab:
     
 
     # def catcross_by_string(self, target, output):
+    #     loss = 0
+    #     for i in range(self.num_strings):
+    #         loss += K.categorical_crossentropy(
+    #             target[:, i, :], output[:, i, :])
+    #     return loss
+
+    # def catcross_by_string(self, target, output):
         #     # Compute standard categorical crossentropy
         #     cce = K.categorical_crossentropy(target, output)
 
@@ -79,7 +86,7 @@ class PolyTab:
         #     # Ensure the operations are compatible with TensorFlow's dtype by casting to float
         #     weights = K.switch(K.less_equal(class_diff, 1),
         #                        K.cast(K.ones_like(class_diff), 'float32') * 0.5,
-        #                        K.cast(K.ones_like(class_diff), 'float32') * 1.2)
+        #                        K.cast(K.ones_like(class_diff), 'float32') * 2.0)
 
         #     # Apply the weights to the crossentropy loss
         #     weighted_cce = cce * weights
