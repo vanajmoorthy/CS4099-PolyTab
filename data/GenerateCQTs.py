@@ -21,6 +21,7 @@ class GenerateCQTs:
         self.n_fft = 2048
         self.hop_length = 512
         self.save_path = "./data/cqt/"
+        
 
     def load_repr_and_labels(self, filename):
         audio_file = os.path.join(self.audio_path, f"{filename}_mic.wav")
@@ -84,6 +85,7 @@ class GenerateCQTs:
         return np.swapaxes(data, 0, 1)
 
     def save_data(self, filename, repr_, labels):
+        os.makedirs(self.save_path, exist_ok=True)
         np.savez(os.path.join(self.save_path,
                  f"{filename}.npz"), repr=repr_, labels=labels)
 
