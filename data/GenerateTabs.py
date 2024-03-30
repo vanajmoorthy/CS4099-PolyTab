@@ -3,7 +3,7 @@ import numpy as np
 import jams
 
 class GenerateTabs:
-    def __init__(self, data_path="./GuitarSet/", output_dir="./ground_truth_tabs/"):
+    def __init__(self, data_path="./data/GuitarSet/", output_dir="./data/ground_truth_tabs/"):
         self.anno_path = os.path.join(data_path, "annotation/")
         self.output_dir = output_dir
         if not os.path.exists(self.output_dir):
