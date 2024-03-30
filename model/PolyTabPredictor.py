@@ -165,7 +165,7 @@ class PolyTabPredictor:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         
-        print("saving image")
+        print(output_dir)
         total_frames = len(tabs)
         frames_per_line = 6  # Adjust based on how many frames you want per line of tab
         total_lines = total_frames // frames_per_line + (1 if total_frames % frames_per_line > 0 else 0)
