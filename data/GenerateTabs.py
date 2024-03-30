@@ -26,7 +26,7 @@ class GenerateTabs:
                 end_time = note.time + note.duration
                 midi_number = note.value
                 fret_number = self.midi_to_fret(midi_number, string_num)
-                # Here, you can insert logic to handle overlapping notes if necessary.
+
                 tab_strings.append(f"{string_num+1}: Fret {fret_number}, Start: {start_time}s, End: {end_time}s")
 
         return tab_strings
@@ -45,5 +45,5 @@ class GenerateTabs:
                 print(f"Tabs for {filename} have been saved to {output_file}")
 
 if __name__ == "__main__":
-    tab_generator = GenerateTabs(data_path="./GuitarSet/", output_dir="./ground_truth_tabs/")
+    tab_generator = GenerateTabs(data_path="./data/GuitarSet/", output_dir="./data/ground_truth_tabs/")
     tab_generator.generate_tabs_from_annotations()
