@@ -153,7 +153,7 @@ class PolyTabPredictor:
             self.save_aggregated_tabs_to_file(aggregated_tabs, aggregated_tabs_file)
 
             # Generate and save images of aggregated tabs.
-            self.create_guitar_tab_image(aggregated_tabs, audio_file[:-4])
+            self.create_guitar_tab_image(aggregated_tabs, base_filename[:-4])
         else:
             print("Output directory is not specified.")
         
