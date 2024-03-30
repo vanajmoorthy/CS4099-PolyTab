@@ -194,11 +194,11 @@ class PolyTabPredictor:
                     # Draw strings for this frame
                     for string_index in range(6):
                         y_position = line_index - start_line + (string_index * 0.1)  # Adjust spacing as needed
-                        ax.axhline(y_position, color='black', linewidth=2)
+                        ax.axhline(y_position, color='black', linewidth=1)
                         
                         fret = tab_frame[string_index]
                         if fret not in ['x', '-']:  # Check if fret is a number or 'x'
-                            ax.text(5 + frame_offset, y_position, fret, ha='center', va='center', fontsize=8, family='monospace')  # Adjust text size and position as needed
+                            ax.text(5 + frame_offset, y_position, fret, ha='center', va='center', fontsize=10, family='monospace')  # Adjust text size and position as needed
             
             ax.axis('off')
             plt.box(False)
