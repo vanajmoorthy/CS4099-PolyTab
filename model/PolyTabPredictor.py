@@ -151,7 +151,7 @@ class PolyTabPredictor:
             base_filename = os.path.splitext(os.path.basename(audio_file))[0]
             aggregated_tabs_file = os.path.join(output_dir, f"{base_filename}_aggregated_tabs.txt")
             self.save_aggregated_tabs_to_file(aggregated_tabs, aggregated_tabs_file)
-            
+
             # Generate and save images of aggregated tabs.
             self.create_guitar_tab_image(aggregated_tabs, audio_file[:-4])
         else:
@@ -165,6 +165,7 @@ class PolyTabPredictor:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         
+        print("saving image")
         total_frames = len(tabs)
         frames_per_line = 6  # Adjust based on how many frames you want per line of tab
         total_lines = total_frames // frames_per_line + (1 if total_frames % frames_per_line > 0 else 0)
