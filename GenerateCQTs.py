@@ -2,6 +2,7 @@
 # https://github.com/andywiggins/tab-cnn/blob/master/data/TabDataReprGen.py
 
 import os
+import sys
 import numpy as np
 import jams
 from scipy.io import wavfile
