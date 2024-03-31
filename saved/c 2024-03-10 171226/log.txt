@@ -1,0 +1,39 @@
+
+batch_size: 32
+epochs: 8
+spec_repr: c
+data_path: ./data/spec_repr/
+con_win_size: 9
+id_file: id.csv
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ conv2d (Conv2D)             (None, 190, 7, 32)        320       
+                                                                 
+ conv2d_1 (Conv2D)           (None, 188, 5, 64)        18496     
+                                                                 
+ conv2d_2 (Conv2D)           (None, 186, 3, 64)        36928     
+                                                                 
+ max_pooling2d (MaxPooling2  (None, 93, 1, 64)         0         
+ D)                                                              
+                                                                 
+ dropout (Dropout)           (None, 93, 1, 64)         0         
+                                                                 
+ flatten (Flatten)           (None, 5952)              0         
+                                                                 
+ dense (Dense)               (None, 128)               761984    
+                                                                 
+ dropout_1 (Dropout)         (None, 128)               0         
+                                                                 
+ dense_1 (Dense)             (None, 126)               16254     
+                                                                 
+ reshape (Reshape)           (None, 6, 21)             0         
+                                                                 
+ activation (Activation)     (None, 6, 21)             0         
+                                                                 
+=================================================================
+Total params: 833982 (3.18 MB)
+Trainable params: 833982 (3.18 MB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
