@@ -137,7 +137,7 @@ class PolyTabPredictor:
                 file.write(f"{tab_line}\n")
         print(f"Aggregated tabs saved to {filename}")
     
-    def predict_save_aggregated(self, audio_file, output_dir=None, aggregation_window=43):
+    def predict_save_aggregated(self, audio_file, output_dir=None, aggregation_window=9):
         """
         Predicts and aggregates tabs for an audio file and saves them to a text file.
         """
