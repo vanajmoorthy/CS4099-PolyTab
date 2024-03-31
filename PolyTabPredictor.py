@@ -72,7 +72,7 @@ class PolyTabPredictor:
         # Convert predictions to guitar tabs format
         return self.predictions_to_tabs(predictions)
 
-    def predictions_to_tabs(self, predictions, threshold=0.1):
+    def predictions_to_tabs(self, predictions, threshold=0.01):
         """Convert model predictions to guitar tab format.
 
         Args:
@@ -93,7 +93,7 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
-    def aggregate_predictions(self, tabs, aggregation_window=43):
+    def aggregate_predictions(self, tabs, aggregation_window=9):
         """
         Aggregate predictions over a specified window to reduce granularity.
         This method assumes tabs to be a list of lists where each sublist represents
