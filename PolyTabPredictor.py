@@ -93,7 +93,7 @@ class PolyTabPredictor:
             tabs.append(tab_frame)
         return tabs
     
-    def aggregate_predictions(self, tabs, aggregation_window=9):
+    def aggregate_predictions(self, tabs, aggregation_window=43):
         """
         Aggregate predictions over a specified window to reduce granularity.
         This method assumes tabs to be a list of lists where each sublist represents
@@ -137,7 +137,7 @@ class PolyTabPredictor:
                 file.write(f"{tab_line}\n")
         print(f"Aggregated tabs saved to {filename}")
     
-    def predict_save_aggregated(self, audio_file, output_dir=None, aggregation_window=9):
+    def predict_save_aggregated(self, audio_file, output_dir=None, aggregation_window=43):
         """
         Predicts and aggregates tabs for an audio file and saves them to a text file.
         """
