@@ -15,4 +15,4 @@ To run the project and train the model yourself a few step must be taken.
 with the trained weights and the audio you want to predict for. The saved predictions can be found in the /predictions folder.
 * You can then run `python3 PolyTabPredictor.py --weights "saved/c 2024-03-21 171741/5/weights.h5" --audio "path/to/audio/file.wav"` to predict using the model which was trained with the learnable weighted loss and AdamW optimiser.
 
-The accompanying paper for this project is in the file Automatic Polyphonic Guitar Transcription.pdf
+The accompanying paper for this project can be found [here](https://github.com/vanajmoorthy/CS4099-PolyTab/blob/main/Automatic%20Polyphonic%20Guitar%20Transcription.pdf)
