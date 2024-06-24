@@ -1,5 +1,9 @@
 # PolyTab
 
+A machine-learning model to automatically transcribe audio recordings of solo acoustic guitars to readable guitar tablature built using TensorFlow. Undertaken for my Senior-Honours dissertation at the University of St Andrews, this model builds on academic work in the nascent field of using machine learning for Music Information Retrieval (MIR) and utilises a convolutional neural network to learn features from spectograms of guitar audio recordings to automatically produce usable guitar tablature
+
+Supervised by [Dr Oggie Arandelovic](https://www.st-andrews.ac.uk/computer-science/people/oa7/) who awarded me a grade of a first and called it "very good work with some genuine contributions to the state of the art".
+
 To run the project and train the model yourself a few step must be taken.
 * The dataset can be downloaded [here](https://zenodo.org/record/1422265/files/GuitarSet_audio_and_annotation.zip?download=1). Make sure to unzip this folder and place it in the root directory of the project.
 * After that, you must activate a virtual environment to install the dependencies. This can be done with `python3 -m venv <env>`
